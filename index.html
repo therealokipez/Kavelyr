@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kavelyr — Discover who you can become</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=DM+Sans:wght@400;500;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
 :root{--bg:#F3F5F1;--card:#fff;--ink:#0F2A24;--mut:#4A5F59;--line:#DCE4DE;--acc:#1F7A63;--on:#fff;--warm:#FBF1DA;--wink:#4A3A12;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1C19;--card:#152825;--ink:#EAF0EC;--mut:#A9BDB5;--line:#27403A;--acc:#4CC3A2;--on:#06231C;--warm:#3A2F14;--wink:#F2DDA6}}
@@ -39,16 +40,38 @@ label{font-weight:700;display:block;margin:12px 0 6px}
 <script>
 const $=s=>document.querySelector(s);
 const E=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const mem={};
-const st={get(k){try{return localStorage.getItem(k)}catch(e){return mem[k]==null?null:mem[k]}},set(k,v){try{localStorage.setItem(k,v)}catch(e){mem[k]=v}},del(k){try{localStorage.removeItem(k)}catch(e){delete mem[k]}}};
-const users=()=>{try{return JSON.parse(st.get('kv_u')||'{}')}catch(e){return{}}};
-const rnd=()=>[...crypto.getRandomValues(new Uint8Array(12))].map(x=>x.toString(16).padStart(2,'0')).join('');
-async function hash(p,s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s+p));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
-const fresh=()=>({ob:{goals:[]},a:{},done:{},ostep:0,astep:0,plans:[],cur:'',journal:[],dis:[]});
+const SB=supabase.createClient('https://unupbkiswkmnoczydhgo.supabase.co','sb_publishable_WApQRt0MfdCvt329JmYVBw_NEEuFCg5');
+const uid=()=>crypto.randomUUID();
+const fresh=()=>({ob:{goals:[]},a:{},done:{},ostep:0,astep:0,plans:[],cur:'',journal:[],dis:[],_s:[],_t:[],_j:[]});
 const cp=()=>D.plans.find(p=>p.id===D.cur)||null;
-const mig=()=>{if(!D.plans){D.plans=D.chosen?[{id:rnd(),n:D.chosen,plan:D.plan||[]}]:[];D.cur=D.plans[0]?D.plans[0].id:''}};
-let me=null,D=null,V={tab:'profile',f:null,edit:false,mode:'signup',err:'',exp:false,cd:false};
-const save=()=>{if(!me)return;const u=users();if(u[me]){u[me].d=D;st.set('kv_u',JSON.stringify(u))}};
+let me=null,D=null,V={tab:'profile',f:null,edit:false,mode:'signup',err:'',exp:false,cd:false,msg:''},tm=null;
+const save=()=>{if(!me)return;clearTimeout(tm);tm=setTimeout(sync,600)};
+async function sync(){const u=me;if(!u||!D)return;clearTimeout(tm);tm=null;const o=D.ob,a=D.a;
+D.plans.forEach(p=>p.plan.forEach(t=>{t.id=t.id||uid()}));D.journal.forEach(j=>{j.id=j.id||uid();j.at=j.at||new Date().toISOString()});
+const sk=D.plans.map(p=>({id:p.id,user_id:u,name:p.n})),tk=[];
+D.plans.forEach(p=>p.plan.forEach((t,i)=>tk.push({id:t.id,skill_id:p.id,user_id:u,text:t.t,done:!!t.done,position:i})));
+const jn=D.journal.map(j=>({id:j.id,user_id:u,body:j.t,created_at:j.at})),gone=(x,y)=>x.filter(i=>!y.includes(i)),
+ids=l=>l.map(x=>x.id),ds=gone(D._s,ids(sk)),dt=gone(D._t,ids(tk)),dj=gone(D._j,ids(jn));
+const q=[()=>SB.from('profiles').upsert({id:u,reason:o.reason||null,goals:o.goals||[],situation:o.situation||null,session_time:o.time||null,dismissed:D.dis,onboarding_done:!!D.done.ob,assessment_done:!!D.done.as,onboarding_step:D.ostep,assessment_step:D.astep}),
+()=>SB.from('answers').upsert({user_id:u,interests:a.interests||[],good:a.good||[],shown:a.shown||[],core_values:a.values||[],learn:a.learn||null,collab:a.collab||null,proud:a.proud||null,aspire:a.aspire||null,time_per_week:a.time||null})];
+if(ds.length)q.push(()=>SB.from('skills').delete().in('id',ds));
+if(dt.length)q.push(()=>SB.from('tasks').delete().in('id',dt));
+if(dj.length)q.push(()=>SB.from('journal').delete().in('id',dj));
+if(sk.length)q.push(()=>SB.from('skills').upsert(sk));
+if(tk.length)q.push(()=>SB.from('tasks').upsert(tk));
+if(jn.length)q.push(()=>SB.from('journal').upsert(jn));
+try{for(const f of q){const r=await f();if(r.error)throw r.error}D._s=ids(sk);D._t=ids(tk);D._j=ids(jn);if(V.msg){V.msg='';render()}}
+catch(x){V.msg='Could not save your latest changes. Check your connection and try again.';if(me&&!V.f)render()}}
+async function load(){const g=n=>SB.from(n).select('*'),R=await Promise.all([g('profiles'),g('answers'),g('skills').order('created_at'),g('tasks').order('position'),g('journal').order('created_at',{ascending:false})]),bad=R.find(x=>x.error);if(bad)throw bad.error;
+const p=R[0].data[0]||{},a=R[1].data[0]||{};D=fresh();
+D.ob={reason:p.reason||'',goals:p.goals||[],situation:p.situation||'',time:p.session_time||''};
+D.a={interests:a.interests||[],good:a.good||[],shown:a.shown||[],values:a.core_values||[],learn:a.learn||'',collab:a.collab||'',proud:a.proud||'',aspire:a.aspire||'',time:a.time_per_week||''};
+D.done={ob:!!p.onboarding_done,as:!!p.assessment_done};D.ostep=p.onboarding_step||0;D.astep=p.assessment_step||0;D.dis=p.dismissed||[];
+D.plans=R[2].data.map(s=>({id:s.id,n:s.name,plan:R[3].data.filter(t=>t.skill_id===s.id).map(t=>({id:t.id,t:t.text,done:t.done}))}));
+D.cur=D.plans[0]?D.plans[0].id:'';
+D.journal=R[4].data.map(j=>({id:j.id,d:new Date(j.created_at).toLocaleDateString(),t:j.body,at:j.created_at}));
+D._s=R[2].data.map(x=>x.id);D._t=R[3].data.map(x=>x.id);D._j=R[4].data.map(x=>x.id)}
+window.addEventListener('pagehide',()=>{if(tm)sync()});
 
 const INT=['Technology','Writing','Design','Teaching','Health','Business','Science','Arts','Community','Finance','Law','Nature'];
 const STR=['Explaining ideas','Organising','Solving problems','Creating','Leading','Listening','Researching','Persuading'];
@@ -91,7 +114,7 @@ return `<main class="w" style="padding-top:48px"><h1>Kavelyr</h1><p class="mut" 
 <label for="pw">Password</label><input id="pw" type="password" autocomplete="${s?'new-password':'current-password'}" required>
 ${V.err?`<p class="warm" role="alert">${E(V.err)}</p>`:''}
 <div class="row" style="margin-top:16px"><button class="btn">${s?'Create account':'Log in'}</button><button type="button" class="btn g" data-a="mode">${s?'I have an account':'Create an account'}</button></div>
-<p class="mut">Passwords are salted and hashed, never stored as plain text. In this prototype your data stays in this browser only, so email verification and recovery need a server.</p></form></main>`}
+<p class="mut">Your account and answers are stored securely, and only you can read them.</p></form></main>`}
 
 function flow(){const f=V.f,L=f==='ob'?OB:AS,k=f==='ob'?'ostep':'astep',i=D[k],d=L[i],s=f==='ob'?D.ob:D.a,v=s[d.k];
 const body=d.t==='text'?`<textarea data-key="${d.k}" rows="5" aria-label="${E(d.q)}">${E(v||'')}</textarea>`:`<div class="chips">${d.o.map(o=>{const on=d.t==='multi'?(v||[]).includes(o):v===o;return `<button type="button" class="chip" aria-pressed="${on}" data-a="opt" data-v="${E(o)}">${E(o)}</button>`}).join('')}</div>`;
@@ -102,7 +125,7 @@ return `<main class="w"><span class="tag">${f==='ob'?'Getting started':E(d.s)} �
 <div class="row" style="margin-top:24px"><button class="btn g" data-a="back" ${i?'':'disabled'}>Back</button><button class="btn" data-a="next">${i===L.length-1?'Finish':'Next'}</button><button class="btn g" data-a="next">Skip</button>${V.edit?'<button class="btn g" data-a="exit">Cancel</button>':''}</div></main>`}
 
 const T=[['profile','Profile'],['explore','Explore'],['plan','Plan'],['journal','Journal'],['settings','Settings']];
-function home(){return `<nav class="tabs" aria-label="Sections"><span class="brand">Kavelyr</span>${T.map(x=>`<button class="tab" ${V.tab===x[0]?'aria-current="page"':''} data-a="tab" data-v="${x[0]}">${x[1]}</button>`).join('')}</nav><main class="w">${views[V.tab]()}</main>`}
+function home(){return `<nav class="tabs" aria-label="Sections"><span class="brand">Kavelyr</span>${T.map(x=>`<button class="tab" ${V.tab===x[0]?'aria-current="page"':''} data-a="tab" data-v="${x[0]}">${x[1]}</button>`).join('')}</nav><main class="w">${V.msg?`<p class="warm" role="alert">${E(V.msg)}</p>`:''}${views[V.tab]()}</main>`}
 const sec=(t,h)=>`<div class="card"><span class="tag">${t}</span>${h}</div>`;
 const chips=l=>l.length?`<div class="chips">${l.map(i=>`<button class="chip" data-a="dis" data-v="${E(i)}" aria-label="Remove ${E(i)} from my profile">${E(i)} ×</button>`).join('')}</div>`:'<p class="mut">Nothing added yet.</p>';
 const views={
@@ -131,12 +154,12 @@ ${d===t&&t?'<div class="warm">Nice work. Write what you learned in your Journal,
 journal(){return `<h1>Journal</h1><div class="card"><label for="j">What did you notice, try, or learn?</label><textarea id="j" rows="4"></textarea><div style="margin-top:12px"><button class="btn" data-a="savej">Save reflection</button></div></div>`+(D.journal.length?D.journal.map((e,i)=>`<div class="card"><span class="tag">${E(e.d)}</span><p style="white-space:pre-wrap;margin:0 0 10px">${E(e.t)}</p><button class="btn g" data-a="delj" data-v="${i}">Delete</button></div>`).join(''):'<p class="mut">No reflections yet.</p>')},
 settings(){return `<h1>Settings and privacy</h1>
 <div class="card"><span class="tag">Update my answers</span><p class="mut">Your answers can change anytime. Suggestions update with them.</p><div class="row"><button class="btn g" data-a="edit" data-v="ob">Edit getting-started answers</button><button class="btn g" data-a="edit" data-v="as">Edit assessment</button></div></div>
-<div class="card"><span class="tag">My data</span><p class="mut">We store your answers, plan, and reflections only to personalise your experience. In this prototype they live in this browser.</p><button class="btn g" data-a="export">${V.exp?'Hide my data':'Show my data'}</button>${V.exp?`<textarea readonly rows="8" style="margin-top:12px" aria-label="My data">${E(JSON.stringify(D,null,1))}</textarea>`:''}</div>
+<div class="card"><span class="tag">My data</span><p class="mut">We store your answers, plan, and reflections only to personalise your experience. You can view them or delete your account at any time.</p><button class="btn g" data-a="export">${V.exp?'Hide my data':'Show my data'}</button>${V.exp?`<textarea readonly rows="8" style="margin-top:12px" aria-label="My data">${E(JSON.stringify(D,(k,v)=>k[0]==='_'?undefined:v,1))}</textarea>`:''}</div>
 <div class="card"><span class="tag">Account</span><div class="row"><button class="btn g" data-a="out">Log out</button>${V.cd?'<button class="btn" data-a="del2">Yes, permanently delete my account</button><button class="btn g" data-a="del0">Keep it</button>':'<button class="btn g" data-a="del1">Delete account</button>'}</div></div>`}};
 
 function render(){$('#app').innerHTML=!me?auth():V.f?flow():home();window.scrollTo(0,0)}
-function enter(em){me=em;st.set('kv_s',em);D=users()[em].d;mig();V={tab:'profile',f:!D.done.ob?'ob':!D.done.a_?(!D.done.as?'as':null):null,edit:false,mode:'login',err:'',exp:false,cd:false}}
-function act(a,v){const f=V.f,L=f==='ob'?OB:AS,k=f==='ob'?'ostep':'astep';
+async function enter(id){me=id;try{await load()}catch(x){me=null;D=null;throw x}V={tab:'profile',f:!D.done.ob?'ob':!D.done.as?'as':null,edit:false,mode:'login',err:'',exp:false,cd:false,msg:''}}
+async function act(a,v){const f=V.f,L=f==='ob'?OB:AS,k=f==='ob'?'ostep':'astep';
 switch(a){
 case 'mode':V.mode=V.mode==='signup'?'login':'signup';V.err='';break;
 case 'opt':{const d=L[D[k]],s=f==='ob'?D.ob:D.a;if(d.t==='multi'){const r=s[d.k]=s[d.k]||[],i=r.indexOf(v);if(i>-1)r.splice(i,1);else if(!d.max||r.length<d.max)r.push(v)}else s[d.k]=s[d.k]===v?'':v;break}
@@ -146,8 +169,8 @@ case 'exit':V.f=null;V.edit=false;break;
 case 'tab':V.tab=v;V.exp=false;break;
 case 'dis':D.dis.push(v);break;
 case 'undis':D.dis=[];break;
-case 'pick':{const c=C.find(x=>x.n===v);let p=D.plans.find(x=>x.n===c.n);if(!p){p={id:rnd(),n:c.n,plan:[{t:'Talk to someone working in '+c.n+' for 15 minutes (days 1–5)'},{t:c.x+' (days 3–10)'},{t:'Write down what energised you and what drained you (days 11–14)'}]};D.plans.push(p)}D.cur=p.id;V.tab='plan';break}
-case 'addskill':{const x=$('#sk').value.trim();if(!x)break;let p=D.plans.find(q=>q.n.toLowerCase()===x.toLowerCase());if(!p){p={id:rnd(),n:x,plan:[{t:'Talk to someone who uses '+x+' for 15 minutes (days 1–5)'},{t:'Try one beginner exercise or tutorial in '+x+' (days 3–10)'},{t:'Write down what energised you and what drained you (days 11–14)'}]};D.plans.push(p)}D.cur=p.id;V.tab='plan';break}
+case 'pick':{const c=C.find(x=>x.n===v);let p=D.plans.find(x=>x.n===c.n);if(!p){p={id:uid(),n:c.n,plan:[{t:'Talk to someone working in '+c.n+' for 15 minutes (days 1–5)'},{t:c.x+' (days 3–10)'},{t:'Write down what energised you and what drained you (days 11–14)'}]};D.plans.push(p)}D.cur=p.id;V.tab='plan';break}
+case 'addskill':{const x=$('#sk').value.trim();if(!x)break;let p=D.plans.find(q=>q.n.toLowerCase()===x.toLowerCase());if(!p){p={id:uid(),n:x,plan:[{t:'Talk to someone who uses '+x+' for 15 minutes (days 1–5)'},{t:'Try one beginner exercise or tutorial in '+x+' (days 3–10)'},{t:'Write down what energised you and what drained you (days 11–14)'}]};D.plans.push(p)}D.cur=p.id;V.tab='plan';break}
 case 'sw':D.cur=v;V.rm='';break;
 case 'rm1':V.rm=D.cur;break;
 case 'rmno':V.rm='';break;
@@ -160,15 +183,18 @@ case 'edit':V.f=v;V.edit=true;D[v==='ob'?'ostep':'astep']=0;break;
 case 'export':V.exp=!V.exp;break;
 case 'del1':V.cd=true;break;
 case 'del0':V.cd=false;break;
-case 'out':me=null;D=null;st.del('kv_s');V.mode='login';break;
-case 'del2':{const u=users();delete u[me];st.set('kv_u',JSON.stringify(u));st.del('kv_s');me=null;D=null;V.cd=false;V.mode='signup';break}}
-save();render()}
+case 'out':{await sync();await SB.auth.signOut();me=null;D=null;V.mode='login';break}
+case 'del2':{try{const r=await SB.rpc('delete_my_account');if(r.error)throw r.error;await SB.auth.signOut();me=null;D=null;V.cd=false;V.mode='signup'}catch(x){V.msg='Could not delete your account. Try again.'}break}}
+if(!['tab','mode','export','del0','del1','rm1','rmno','sw'].includes(a))save();render()}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b)act(b.dataset.a,b.dataset.v)});
 document.addEventListener('input',e=>{const el=e.target;if(el.dataset&&el.dataset.key&&V.f&&D){(V.f==='ob'?D.ob:D.a)[el.dataset.key]=el.value;save()}});
-document.addEventListener('submit',async e=>{e.preventDefault();const em=$('#em').value.trim().toLowerCase(),pw=$('#pw').value,u=users();V.err='';
+document.addEventListener('submit',async e=>{e.preventDefault();const em=$('#em').value.trim().toLowerCase(),pw=$('#pw').value;V.err='';
 if(!/^\S+@\S+\.\S+$/.test(em)){V.err='Enter a valid email address.';return render()}
-if(V.mode==='signup'){if(u[em])V.err='An account with this email already exists here. Try logging in.';else if(pw.length<8)V.err='Use at least 8 characters.';else{const s=rnd();u[em]={s,h:await hash(pw,s),d:fresh()};st.set('kv_u',JSON.stringify(u));enter(em)}}
-else{const r=u[em];if(!r||r.h!==await hash(pw,r.s))V.err='Email or password is incorrect.';else enter(em)}
+if(V.mode==='signup'&&pw.length<8){V.err='Use at least 8 characters.';return render()}
+e.target.querySelector('button').disabled=true;
+try{if(V.mode==='signup'){const r=await SB.auth.signUp({email:em,password:pw});if(r.error)throw r.error;if(!r.data.session){V.err='Check your email to confirm your account, then log in.';V.mode='login';return render()}await enter(r.data.session.user.id)}
+else{const r=await SB.auth.signInWithPassword({email:em,password:pw});if(r.error)throw r.error;await enter(r.data.user.id)}}
+catch(x){V.err=x.message||'Something went wrong. Try again.'}
 render()});
-(function(){const e=st.get('kv_s'),r=e&&users()[e];if(r){me=e;D=r.d;mig();V.f=!D.done.ob?'ob':!D.done.as?'as':null}render()})();
+(async function(){$('#app').innerHTML='<main class="w"><p class="mut">Loading…</p></main>';const r=await SB.auth.getSession(),ss=r.data.session;if(ss){try{await enter(ss.user.id)}catch(x){V.err='Could not load your data. Log in again.'}}render()})();
 </script></body></html>
