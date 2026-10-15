@@ -3,6 +3,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kavelyr — Discover who you can become</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=DM+Sans:wght@400;500;700&display=swap">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#1F7A63">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
 :root{--bg:#F3F5F1;--card:#fff;--ink:#0F2A24;--mut:#4A5F59;--line:#DCE4DE;--acc:#1F7A63;--on:#fff;--warm:#FBF1DA;--wink:#4A3A12;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -43,13 +47,13 @@ const E=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','
 const REC=/type=recovery/.test(location.hash);
 const SB=supabase.createClient('https://unupbkiswkmnoczydhgo.supabase.co','sb_publishable_WApQRt0MfdCvt329JmYVBw_NEEuFCg5');
 const uid=()=>crypto.randomUUID();
-const fresh=()=>({ob:{goals:[]},a:{},done:{},ostep:0,astep:0,plans:[],cur:'',journal:[],dis:[],pd:{},ref:'',refs:0,_s:[],_t:[],_j:[]});
+const fresh=()=>({ob:{goals:[]},a:{},done:{},ostep:0,astep:0,plans:[],cur:'',journal:[],dis:[],pd:{},ref:'',refs:0,cks:[],_s:[],_t:[],_j:[]});
 const cp=()=>D.plans.find(p=>p.id===D.cur)||null;
 let me=null,D=null,V={tab:'profile',f:null,edit:false,mode:'signup',err:'',exp:false,cd:false,msg:'',ref:'',cp:''},tm=null;
 const save=()=>{if(!me)return;clearTimeout(tm);tm=setTimeout(sync,600)};
 async function sync(){const u=me;if(!u||!D)return;clearTimeout(tm);tm=null;const o=D.ob,a=D.a;
 D.plans.forEach(p=>p.plan.forEach(t=>{t.id=t.id||uid()}));D.journal.forEach(j=>{j.id=j.id||uid();j.at=j.at||new Date().toISOString()});
-const sk=D.plans.map(p=>({id:p.id,user_id:u,name:p.n})),tk=[];
+const sk=D.plans.map(p=>Object.assign({id:p.id,user_id:u,name:p.n},p.o?{overview:JSON.stringify(p.o)}:{})),tk=[];
 D.plans.forEach(p=>p.plan.forEach((t,i)=>tk.push({id:t.id,skill_id:p.id,user_id:u,text:t.t,done:!!t.done,position:i})));
 const jn=D.journal.map(j=>({id:j.id,user_id:u,body:j.t,created_at:j.at})),gone=(x,y)=>x.filter(i=>!y.includes(i)),
 ids=l=>l.map(x=>x.id),ds=gone(D._s,ids(sk)),dt=gone(D._t,ids(tk)),dj=gone(D._j,ids(jn));
@@ -61,6 +65,7 @@ if(dj.length)q.push(()=>SB.from('journal').delete().in('id',dj));
 if(sk.length)q.push(()=>SB.from('skills').upsert(sk));
 if(tk.length)q.push(()=>SB.from('tasks').upsert(tk));
 if(jn.length)q.push(()=>SB.from('journal').upsert(jn));
+if(D.cks.length)q.push(()=>SB.from('weekly_checkins').upsert(D.cks.map(c=>({user_id:u,week_start:c.w,energised_text:c.e||null,drained_text:c.d||null,progress_rating:c.r||null,note:c.n||null})),{onConflict:'user_id,week_start'}));
 try{for(const f of q){const r=await f();if(r.error)throw r.error}D._s=ids(sk);D._t=ids(tk);D._j=ids(jn);if(V.msg){V.msg='';render()}}
 catch(x){V.msg='Could not save your latest changes. Check your connection and try again.';if(me&&!V.f)render()}}
 async function load(){const g=n=>SB.from(n).select('*'),R=await Promise.all([g('profiles'),g('answers'),g('skills').order('created_at'),g('tasks').order('position'),g('journal').order('created_at',{ascending:false})]),bad=R.find(x=>x.error);if(bad)throw bad.error;
@@ -68,14 +73,14 @@ const p=R[0].data[0]||{},a=R[1].data[0]||{};D=fresh();
 D.ob={reason:p.reason||'',goals:p.goals||[],situation:p.situation||'',time:p.session_time||''};
 D.a={interests:a.interests||[],good:a.good||[],shown:a.shown||[],values:a.core_values||[],learn:a.learn||'',collab:a.collab||'',proud:a.proud||'',aspire:a.aspire||'',time:a.time_per_week||''};
 D.done={ob:!!p.onboarding_done,as:!!p.assessment_done};D.ostep=p.onboarding_step||0;D.astep=p.assessment_step||0;D.dis=p.dismissed||[];
-D.plans=R[2].data.map(s=>({id:s.id,n:s.name,plan:R[3].data.filter(t=>t.skill_id===s.id).map(t=>({id:t.id,t:t.text,done:t.done}))}));
+D.plans=R[2].data.map(s=>({id:s.id,n:s.name,o:pj(s.overview),plan:R[3].data.filter(t=>t.skill_id===s.id).map(t=>({id:t.id,t:t.text,done:t.done}))}));
 D.cur=D.plans[0]?D.plans[0].id:'';
 D.pd={display_name:p.display_name||'',country:p.country||'',bio:p.bio||''};D.ref=p.referral_code||'';
 D.journal=R[4].data.map(j=>({id:j.id,d:new Date(j.created_at).toLocaleDateString(),t:j.body,at:j.created_at}));
-D._s=R[2].data.map(x=>x.id);D._t=R[3].data.map(x=>x.id);D._j=R[4].data.map(x=>x.id);const rc=await SB.rpc('my_referral_count');D.refs=rc.data||0}
+D._s=R[2].data.map(x=>x.id);D._t=R[3].data.map(x=>x.id);D._j=R[4].data.map(x=>x.id);const rc=await SB.rpc('my_referral_count');D.refs=rc.data||0;const ck=await SB.from('weekly_checkins').select('*').order('week_start',{ascending:false});D.cks=(ck.data||[]).map(x=>({w:x.week_start,e:x.energised_text||'',d:x.drained_text||'',r:x.progress_rating||0,n:x.note||''}))}
 window.addEventListener('pagehide',()=>{if(tm)sync()});
 
-const INT=['Technology','Writing','Design','Teaching','Health','Business','Science','Arts','Community','Finance','Law','Nature'];
+const INT=['Technology','Engineering','Agriculture','Health','Podcasting & audio','Film & video','Music','Writing','Design','Arts','Teaching','Science','Business','Finance','Law','Community','Social impact','Nature','Energy & climate','Sports & fitness','Fashion & beauty','Food & hospitality','Gaming','Real estate'];
 const STR=['Explaining ideas','Organising','Solving problems','Creating','Leading','Listening','Researching','Persuading'];
 const VAL=['Creativity','Stability','Independence','Service','Learning','Achievement','Connection','Flexibility'];
 const OB=[
@@ -104,7 +109,19 @@ const C=[
 {n:'Health & wellbeing support',t:['Health','Listening','Service','Connection'],x:'Volunteer or shadow for a few hours in a health or support setting'},
 {n:'Law & policy',t:['Law','Researching','Persuading','Writing','Service'],x:'Read one short case or policy brief and summarise it in your own words'},
 {n:'Finance & analysis',t:['Finance','Organising','Solving problems','Stability','Business'],x:'Build a simple budget or analysis of a real example in a spreadsheet'},
-{n:'Environment & outdoors',t:['Nature','Science','Service','Independence'],x:'Join or observe one local environmental activity and note what stood out'}];
+{n:'Environment & outdoors',t:['Nature','Science','Service','Independence'],x:'Join or observe one local environmental activity and note what stood out'},
+{n:'Agriculture & food systems',t:['Agriculture','Nature','Science','Business','Community','Service'],x:'Visit a farm or market and ask one person how they decide what to grow or sell'},
+{n:'Engineering',t:['Engineering','Solving problems','Technology','Science','Creating'],x:'Take apart or sketch one everyday device and explain how it works'},
+{n:'Podcasting & audio media',t:['Podcasting & audio','Writing','Listening','Explaining ideas','Creativity','Persuading'],x:'Record a 3-minute voice note on a topic you know and send it to two people'},
+{n:'Film & video',t:['Film & video','Creating','Arts','Creativity','Writing'],x:'Shoot a 60-second video on your phone and ask for feedback'},
+{n:'Music & performance',t:['Music','Arts','Creativity','Independence'],x:'Perform or share one piece for a small audience and note how it felt'},
+{n:'Sports & fitness coaching',t:['Sports & fitness','Health','Leading','Teaching','Connection'],x:'Plan and lead a 20-minute session for one friend'},
+{n:'Fashion & beauty',t:['Fashion & beauty','Design','Creativity','Business','Creating'],x:'Create one look or design and show it to three people for honest reactions'},
+{n:'Hospitality & food',t:['Food & hospitality','Organising','Business','Service','Connection'],x:'Spend two hours shadowing someone in a kitchen, cafe, or event team'},
+{n:'Social impact',t:['Social impact','Community','Service','Leading','Connection'],x:'Volunteer for one local cause and note what energised you'},
+{n:'Energy & climate',t:['Energy & climate','Engineering','Science','Nature','Service'],x:'Research one local energy or climate project and summarise it in your own words'},
+{n:'Game design & development',t:['Gaming','Technology','Design','Creating','Solving problems'],x:'Design a simple game on paper and let two people play it'},
+{n:'Real estate',t:['Real estate','Business','Persuading','Finance','Organising'],x:'Talk to an agent or property manager for 15 minutes about their week'}];
 
 function rank(){const a=D.a,I=a.interests||[],G=a.good||[],S=a.shown||[],M=a.values||[];
 return C.map(c=>{let s=0;const m=[];c.t.forEach(t=>{const w=(I.includes(t)?1:0)+(S.includes(t)?2:0)+(G.includes(t)&&!S.includes(t)?1:0)+(M.includes(t)?1:0);if(w){s+=w;m.push(t)}});return Object.assign({},c,{s,m})}).filter(c=>c.s>0).sort((x,y)=>y.s-x.s).slice(0,4)}
@@ -121,17 +138,58 @@ ${V.err?`<p class="warm" role="alert">${E(V.err)}</p>`:''}
 ${m==='login'?'<p style="margin:8px 0 0"><button type="button" class="btn g" style="border:0;padding:0 4px;text-decoration:underline" data-a="forgot">Forgot password?</button></p>':''}
 </form></main>`}
 
+const OV={
+'Product & UX design':['Shaping how apps and products look and work so people can use them easily.',['User research','Wireframing','Visual design','Prototyping']],
+'Software development':['Building websites, apps, and systems by writing and testing code.',['Programming basics','Problem solving','Version control','Debugging']],
+'Teaching & education':['Helping people learn through clear explanation, practice, and feedback.',['Explaining clearly','Lesson planning','Patience','Assessment']],
+'Data & research':['Finding answers by collecting, analysing, and interpreting evidence.',['Research methods','Spreadsheets','Statistics basics','Clear reporting']],
+'Content & communications':['Telling stories and sharing messages through writing, social media, and campaigns.',['Writing','Editing','Audience insight','Social media']],
+'Community & programme work':['Bringing people together and running programmes that serve a group or cause.',['Organising','Facilitation','Partnerships','Event planning']],
+'Business & entrepreneurship':['Spotting a need and building a product or service people will pay for.',['Customer discovery','Selling','Budgeting','Leadership']],
+'Health & wellbeing support':['Supporting people’s physical or mental wellbeing in care, community, or clinic settings.',['Active listening','Empathy','Basic health knowledge','Boundaries']],
+'Law & policy':['Understanding rules and shaping or applying them to protect rights and solve disputes.',['Legal research','Argument','Writing','Critical reading']],
+'Finance & analysis':['Managing, measuring, and planning money for people and organisations.',['Spreadsheets','Accounting basics','Forecasting','Attention to detail']],
+'Environment & outdoors':['Protecting and working with natural spaces and resources.',['Field observation','Ecology basics','Data collection','Community outreach']],
+'Agriculture & food systems':['Growing, processing, and distributing food, from small farms to supply chains.',['Crop or livestock basics','Soil and water','Farm business','Market linkage']],
+'Engineering':['Designing and building machines, structures, and systems that solve practical problems.',['Maths','Technical drawing','Problem solving','Prototyping']],
+'Podcasting & audio media':['Creating spoken-word shows and audio stories people listen to on demand.',['Interviewing','Scripting','Audio editing','Audience building']],
+'Film & video':['Telling stories through moving images, from planning and shooting to editing.',['Storyboarding','Camera basics','Editing','Storytelling']],
+'Music & performance':['Creating and performing music or live shows for audiences.',['Instrument or voice','Composition','Stage presence','Self-promotion']],
+'Sports & fitness coaching':['Helping people train, improve, and stay active safely.',['Exercise basics','Motivation','Session planning','Safety']],
+'Fashion & beauty':['Designing, styling, and selling clothing, accessories, or beauty services.',['Design sketching','Materials','Trend awareness','Customer service']],
+'Hospitality & food':['Welcoming guests and preparing food, drinks, or events.',['Customer care','Food safety','Teamwork','Time management']],
+'Social impact':['Working on social problems through nonprofits, campaigns, or community projects.',['Project planning','Fundraising basics','Advocacy','Partnership building']],
+'Energy & climate':['Developing cleaner energy and solutions that reduce environmental harm.',['Energy basics','Data analysis','Project management','Policy awareness']],
+'Game design & development':['Creating games, from rules and levels to code and art.',['Game mechanics','Programming','Level design','Playtesting']],
+'Real estate':['Buying, selling, renting, and managing property.',['Negotiation','Local market knowledge','Contracts basics','Networking']]};
+const pj=x=>{try{return x?JSON.parse(x):null}catch(e){return null}};
+function overviewCard(c){const k=OV[c.n],ai=!k&&c.o,o=k?{w:k[0],s:k[1],t:(C.find(x=>x.n===c.n)||{}).x}:c.o;
+return `<div class="card"><span class="tag">About this path</span>${o?`<p>${E(o.w)}</p><p class="mut">Skills to build</p><div class="chips">${(o.s||[]).map(x=>`<span class="chip" style="cursor:default">${E(x)}</span>`).join('')}</div>${o.t?`<p class="mut">Good first step: ${E(o.t)}</p>`:''}${ai?'<p class="mut">AI summary. Check it with someone who works in this field.</p>':''}`:`<p class="mut">Get a short summary of what this path involves.</p><button class="btn g" data-a="aiov">Generate overview (AI)</button>${V.ov?`<p class="warm" role="status">${E(V.ov)}</p>`:''}`}<p class="mut">Coming soon: connect with a teacher who can guide you in this skill.</p></div>`}
+function aiBox(d,v){const a=V.ai||{},pk=a.key===d.k?(a.picks||[]).filter(x=>!(v||[]).includes(x)):[];
+return `<div class="card" style="margin-top:20px"><span class="tag">AI helper</span><label for="aiq">Not sure what to pick? Tell me in your own words.</label><textarea id="aiq" rows="2" data-aiq="1" placeholder="e.g. I enjoy farming and recording voice notes">${E(V.aiq||'')}</textarea><div class="row" style="margin-top:10px"><button class="btn g" data-a="aisug" ${a.busy?'disabled':''}>${a.busy?'Thinking…':'Suggest for me'}</button></div>${a.err?`<p class="warm" role="alert">${E(a.err)}</p>`:''}${a.key===d.k&&a.why?`<p>${E(a.why)}</p>${pk.length?`<div class="chips">${pk.map(x=>`<button class="chip" data-a="aiadd" data-v="${E(x)}">+ ${E(x)}</button>`).join('')}</div>`:''}<p class="mut">AI suggestion. You decide what fits.${a.left!=null?' Questions left today: '+a.left+'.':''}</p>`:''}</div>`}
+async function ai(body){const r=await SB.functions.invoke('coach',{body});if(r.error){let m='The AI helper is not available right now.';try{const j=await r.error.context.json();m=j.error||m}catch(x){}throw new Error(m)}return r.data}
 function flow(){const f=V.f,L=f==='ob'?OB:AS,k=f==='ob'?'ostep':'astep',i=D[k],d=L[i],s=f==='ob'?D.ob:D.a,v=s[d.k];
 const body=d.t==='text'?`<textarea data-key="${d.k}" rows="5" aria-label="${E(d.q)}">${E(v||'')}</textarea>`:`<div class="chips">${d.o.map(o=>{const on=d.t==='multi'?(v||[]).includes(o):v===o;return `<button type="button" class="chip" aria-pressed="${on}" data-a="opt" data-v="${E(o)}">${E(o)}</button>`}).join('')}</div>`;
 return `<main class="w"><span class="tag">${f==='ob'?'Getting started':E(d.s)} · ${i+1} of ${L.length}</span>
 <div class="bar" role="progressbar" aria-valuemin="1" aria-valuemax="${L.length}" aria-valuenow="${i+1}"><i style="width:${(i+1)/L.length*100}%"></i></div>
 <h2 style="margin-top:24px">${E(d.q)}</h2>${d.max?`<p class="mut">Choose up to ${d.max}.</p>`:''}
-<p class="mut">${f==='ob'?'Your answers shape suggestions. They are not definitive judgments.':'Skip anything that does not apply. Progress saves automatically.'}</p>${body}
+<p class="mut">${f==='ob'?'Your answers shape suggestions. They are not definitive judgments.':'Skip anything that does not apply. Progress saves automatically.'}</p>${body}${['interests','good','values'].includes(d.k)?aiBox(d,v):''}
 <div class="row" style="margin-top:24px"><button class="btn g" data-a="back" ${i?'':'disabled'}>Back</button><button class="btn" data-a="next">${i===L.length-1?'Finish':'Next'}</button><button class="btn g" data-a="next">Skip</button>${V.edit?'<button class="btn g" data-a="exit">Cancel</button>':''}</div></main>`}
 
+const wk=(d)=>{const x=new Date(d||new Date());x.setDate(x.getDate()-((x.getDay()+6)%7));return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
+const ckNow=()=>{const w=wk();let c=D.cks.find(x=>x.w===w);if(!c){c={w,e:'',d:'',r:0,n:''};D.cks.unshift(c)}return c};
+const streak=()=>{const S=new Set(D.cks.filter(c=>c.e||c.d||c.r).map(c=>c.w));let d=new Date(),n=0;if(!S.has(wk(d)))d.setDate(d.getDate()-7);while(S.has(wk(d))){n++;d.setDate(d.getDate()-7)}return n};
+let dip=null;const lg=k=>{try{return localStorage.getItem(k)}catch(e){return null}},ls=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const standalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+const ios=()=>/iphone|ipad|ipod/i.test(navigator.userAgent);
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dip=e;if(me)render()});
+window.addEventListener('appinstalled',()=>{dip=null;render()});
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/service-worker.js').catch(()=>{}));
+function banner(){if(!D||standalone()||!(dip||ios())||!(D.done.as||D.plans.length))return '';const t=+lg('kv_pp')||0;if(Date.now()<t)return '';
+return `<div class="card"><strong>Install Kavelyr</strong>${dip?'<p class="mut">Add it to your home screen for quick access.</p><div class="row"><button class="btn" data-a="inst">Install</button>':'<p class="mut">Tap the Share button, then “Add to Home Screen”.</p><div class="row">'}<button class="btn g" data-a="pnot">Not now</button><button class="btn g" data-a="pnever">Don't show again</button></div></div>`}
 const refLink=()=>location.origin+location.pathname+'?ref='+(D?D.ref:'');
-const T=[['profile','Profile'],['explore','Explore'],['plan','Plan'],['journal','Journal'],['settings','Settings']];
-function home(){return `<nav class="tabs" aria-label="Sections"><span class="brand">Kavelyr</span>${T.map(x=>`<button class="tab" ${V.tab===x[0]?'aria-current="page"':''} data-a="tab" data-v="${x[0]}">${x[1]}</button>`).join('')}</nav><main class="w">${V.msg?`<p class="warm" role="alert">${E(V.msg)}</p>`:''}${views[V.tab]()}</main>`}
+const T=[['profile','Profile'],['explore','Explore'],['plan','Plan'],['checkin','Check-in'],['journal','Journal'],['settings','Settings']];
+function home(){return `<nav class="tabs" aria-label="Sections"><span class="brand">Kavelyr</span>${T.map(x=>`<button class="tab" ${V.tab===x[0]?'aria-current="page"':''} data-a="tab" data-v="${x[0]}">${x[1]}</button>`).join('')}</nav><main class="w">${V.msg?`<p class="warm" role="alert">${E(V.msg)}</p>`:''}${banner()}${views[V.tab]()}</main>`}
 const sec=(t,h)=>`<div class="card"><span class="tag">${t}</span>${h}</div>`;
 const chips=l=>l.length?`<div class="chips">${l.map(i=>`<button class="chip" data-a="dis" data-v="${E(i)}" aria-label="Remove ${E(i)} from my profile">${E(i)} ×</button>`).join('')}</div>`:'<p class="mut">Nothing added yet.</p>';
 const views={
@@ -148,19 +206,27 @@ ${a.proud||a.aspire?sec('My experiences and aspirations · you said',(a.proud?`<
 ${sec('My opportunities · suggested by Kavelyr',R.length?R.slice(0,3).map(c=>`<p><strong>${E(c.n)}</strong><br><span class="mut">Why it may fit: ${E(c.m.join(', '))}</span></p>`).join('')+'<button class="btn g" data-a="tab" data-v="explore">Explore these</button>':'<p class="mut">Add interests or strengths in your assessment to see suggestions.</p>')}
 ${sec('My next steps · suggested',nx?`<p>${E(nx.t)}</p><button class="btn g" data-a="tab" data-v="plan">Open my plan</button>`:'<p>Choose a direction in Explore to get a small action plan.</p>')}
 ${D.dis.length?'<button class="btn g" data-a="undis">Restore removed items ('+D.dis.length+')</button>':''}`},
-explore(){const R=rank();return `<h1>Explore</h1><p class="mut">Suggestions to investigate, not verdicts. You can disagree and explore anything else.</p>`+(R.length?R.map(c=>`<div class="card"><h2 style="font-size:22px">${E(c.n)}</h2><p>Why it may fit: it matches ${E(c.m.join(', '))}.</p><p class="mut">First experiment: ${E(c.x)}.</p>${D.plans.some(p=>p.n===c.n)?`<button class="btn g" data-a="pick" data-v="${E(c.n)}">Open my plan</button>`:`<button class="btn" data-a="pick" data-v="${E(c.n)}">Work on this</button>`}</div>`).join(''):'<div class="card"><p>Finish your assessment to see areas worth exploring.</p><button class="btn" data-a="edit" data-v="as">Go to assessment</button></div>')+'<div class="card"><span class="tag">Add your own skill</span><label for="sk">A skill or direction you want to learn</label><div class="row"><input id="sk" type="text" style="flex:1;min-width:180px" placeholder="e.g. Public speaking"><button class="btn" data-a="addskill">Start plan</button></div></div>'},
+explore(){const R=rank();return `<h1>Explore</h1><p class="mut">Suggestions to investigate, not verdicts. You can disagree and explore anything else.</p>`+(R.length?R.map(c=>`<div class="card"><h2 style="font-size:22px">${E(c.n)}</h2><p>Why it may fit: it matches ${E(c.m.join(', '))}.</p><p class="mut">First experiment: ${E(c.x)}.</p><button class="btn g" style="margin-bottom:10px" data-a="aiexp" data-v="${E(c.n)}">Why this fits (AI)</button>${V.ex&&V.ex[c.n]?`<p>${E(V.ex[c.n])}</p><p class="mut">AI explanation. A suggestion, not a verdict.</p>`:''}${D.plans.some(p=>p.n===c.n)?`<button class="btn g" data-a="pick" data-v="${E(c.n)}">Open my plan</button>`:`<button class="btn" data-a="pick" data-v="${E(c.n)}">Work on this</button>`}</div>`).join(''):'<div class="card"><p>Finish your assessment to see areas worth exploring.</p><button class="btn" data-a="edit" data-v="as">Go to assessment</button></div>')+'<div class="card"><span class="tag">Add your own skill</span><label for="sk">A skill or direction you want to learn</label><div class="row"><input id="sk" type="text" style="flex:1;min-width:180px" placeholder="e.g. Public speaking"><button class="btn" data-a="addskill">Start plan</button></div></div>'},
 plan(){const c=cp();if(!c)return '<h1>My plans</h1><div class="card"><p>Pick a direction in Explore, or add your own skill, and Kavelyr will create a small two-week plan.</p><button class="btn" data-a="tab" data-v="explore">Explore directions</button></div>';
 const P=c.plan,d=P.filter(p=>p.done).length,t=P.length;
 return `<h1>My plans</h1><div class="chips" role="group" aria-label="My skills">${D.plans.map(p=>`<button class="chip" aria-pressed="${p.id===D.cur}" data-a="sw" data-v="${p.id}">${E(p.n)}</button>`).join('')}<button class="chip" data-a="tab" data-v="explore">+ Add another skill</button></div>
-<div class="card"><span class="tag">Two-week exploration · ${E(c.n)}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${t}" aria-valuenow="${d}"><i style="width:${t?d/t*100:0}%"></i></div><p class="mut">${d} of ${t} actions done</p>
+${overviewCard(c)}<div class="card"><span class="tag">Two-week exploration · ${E(c.n)}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${t}" aria-valuenow="${d}"><i style="width:${t?d/t*100:0}%"></i></div><p class="mut">${d} of ${t} actions done</p>
 ${P.map((p,i)=>`<label class="task"><input type="checkbox" data-a="tog" data-v="${i}" ${p.done?'checked':''}>${E(p.t)}</label>`).join('')}
 <label for="newt">Add your own action</label><div class="row"><input id="newt" type="text" style="flex:1;min-width:180px"><button class="btn g" data-a="addt">Add</button></div>
 <div class="row" style="margin-top:16px">${V.rm===c.id?'<button class="btn" data-a="rmgo">Yes, remove this skill</button><button class="btn g" data-a="rmno">Keep it</button>':'<button class="btn g" data-a="rm1">Remove this skill</button>'}</div></div>
 ${d===t&&t?'<div class="warm">Nice work. Write what you learned in your Journal, then adjust or add another skill.</div><div class="row"><button class="btn" data-a="tab" data-v="journal">Write a reflection</button><button class="btn g" data-a="tab" data-v="explore">Add another skill</button></div>':''}`},
+checkin(){const c=D.cks.find(x=>x.w===wk())||{e:'',d:'',r:0,n:''},prev=D.cks.find(x=>x.w!==wk()),n=streak(),cu=cp(),nt=cu&&cu.plan.find(p=>!p.done);let shift='';
+if(c.e||c.d||c.r){const used=[c.e&&'what energised you',c.d&&'what drained you',c.r&&'your progress rating'].filter(Boolean),
+ch=c.r&&prev&&prev.r?(c.r>prev.r?`Your progress rating rose from ${prev.r} to ${c.r}.`:c.r<prev.r?`Your progress rating moved from ${prev.r} to ${c.r}.`:`Your progress rating held at ${c.r}.`):'',
+step=c.r&&c.r<=2?'Shrink your next action to 10 minutes and do just that.':nt?'Next step: '+nt.t:'Next step: choose a direction in Explore.';
+shift=`<div class="card"><span class="tag">Here's what shifted · suggested</span>${ch?`<p>${ch}</p>`:''}${c.e?`<p>Energised: ${E(c.e)}</p>`:''}${c.d?`<p>Drained: ${E(c.d)}</p>`:''}<p>${E(step)}</p><p class="mut">Based on: ${E(used.join(', '))}.</p></div>`}
+return `<h1>Weekly check-in</h1><p class="mut">Two minutes. Skip any week and nothing is lost. Streak: ${n?n+' week'+(n>1?'s':''):'start a new one any time'}.</p>
+<div class="card"><span class="tag">This week</span><label for="ce">What energised you this week?</label><textarea id="ce" rows="3" data-ck="e">${E(c.e)}</textarea><label for="cd">What drained you?</label><textarea id="cd" rows="3" data-ck="d">${E(c.d)}</textarea><label>How is progress on your plan?</label><div class="chips">${[1,2,3,4,5].map(i=>`<button type="button" class="chip" aria-pressed="${c.r===i}" data-a="rate" data-v="${i}" aria-label="Rate ${i} of 5">${i}</button>`).join('')}</div><label for="cn">Note (optional)</label><input id="cn" type="text" data-ck="n" value="${E(c.n)}"><div style="margin-top:12px"><button class="btn" data-a="sum">Show what shifted</button></div><p class="mut">You can edit this any time this week.</p></div>${shift}
+${D.cks.filter(x=>x.w!==wk()).slice(0,4).map(x=>`<div class="card"><span class="tag">Week of ${E(x.w)}</span><p class="mut">Energised: ${E(x.e||'—')}<br>Drained: ${E(x.d||'—')}<br>Progress: ${x.r||'—'}/5</p></div>`).join('')}`},
 journal(){return `<h1>Journal</h1><div class="card"><label for="j">What did you notice, try, or learn?</label><textarea id="j" rows="4"></textarea><div style="margin-top:12px"><button class="btn" data-a="savej">Save reflection</button></div></div>`+(D.journal.length?D.journal.map((e,i)=>`<div class="card"><span class="tag">${E(e.d)}</span><p style="white-space:pre-wrap;margin:0 0 10px">${E(e.t)}</p><button class="btn g" data-a="delj" data-v="${i}">Delete</button></div>`).join(''):'<p class="mut">No reflections yet.</p>')},
-settings(){const l=refLink();return `<h1>Settings and privacy</h1>
+settings(){const l=refLink();return `<h1>Settings and privacy</h1>${dip?'<div class="card"><span class="tag">Install</span><button class="btn" data-a="inst">Install Kavelyr</button></div>':''}
 <div class="card"><span class="tag">Profile details</span><label for="dn">Display name</label><input id="dn" type="text" data-pf="display_name" value="${E(D.pd.display_name)}"><label for="co">Country</label><input id="co" type="text" data-pf="country" value="${E(D.pd.country)}"><label for="bi">About me (optional)</label><textarea id="bi" rows="3" data-pf="bio">${E(D.pd.bio)}</textarea><p class="mut">Saved automatically. Shown only to you.</p></div>
-<div class="card"><span class="tag">Invite friends</span><p class="mut">Share your referral code. People who sign up with it are counted here.</p><p style="font-size:26px;font-weight:700;letter-spacing:.1em;margin:6px 0">${E(D.ref||'—')}</p><input type="text" readonly value="${E(l)}" aria-label="My referral link"><div class="row" style="margin-top:12px"><button class="btn g" data-a="copy">Copy link</button><span class="mut">${E(V.cp)}</span></div><p class="mut">Friends joined with your code: ${D.refs}</p></div>
+<div class="card"><span class="tag">Invite friends</span><p class="mut">Share your code. Each friend who joins gives you +3 daily AI questions, up to 5 friends.</p><p style="font-size:26px;font-weight:700;letter-spacing:.1em;margin:6px 0">${E(D.ref||'—')}</p><input type="text" readonly value="${E(l)}" aria-label="My referral link"><div class="row" style="margin-top:12px"><button class="btn g" data-a="copy">Copy link</button><span class="mut">${E(V.cp)}</span></div><p class="mut">Friends joined with your code: ${D.refs}</p></div>
 <div class="card"><span class="tag">Update my answers</span><p class="mut">Your answers can change anytime. Suggestions update with them.</p><div class="row"><button class="btn g" data-a="edit" data-v="ob">Edit getting-started answers</button><button class="btn g" data-a="edit" data-v="as">Edit assessment</button></div></div>
 <div class="card"><span class="tag">My data</span><p class="mut">We store your answers, plan, and reflections only to personalise your experience. You can view them or delete your account at any time.</p><button class="btn g" data-a="export">${V.exp?'Hide my data':'Show my data'}</button>${V.exp?`<textarea readonly rows="8" style="margin-top:12px" aria-label="My data">${E(JSON.stringify(D,(k,v)=>k[0]==='_'?undefined:v,1))}</textarea>`:''}</div>
 <div class="card"><span class="tag">Account</span><div class="row"><button class="btn g" data-a="out">Log out</button>${V.cd?'<button class="btn" data-a="del2">Yes, permanently delete my account</button><button class="btn g" data-a="del0">Keep it</button>':'<button class="btn g" data-a="del1">Delete account</button>'}</div></div>`}};
@@ -170,6 +236,15 @@ async function enter(id){me=id;try{await load()}catch(x){me=null;D=null;throw x}
 async function act(a,v){const f=V.f,L=f==='ob'?OB:AS,k=f==='ob'?'ostep':'astep';
 switch(a){
 case 'mode':V.mode=V.mode==='signup'?'login':V.mode==='forgot'?'login':'signup';V.err='';break;
+case 'aisug':{const d=L[D[k]];if(!V.aiq){V.ai={err:'Describe what you enjoy first.'};break}V.ai={busy:true};render();try{const r=await ai({mode:'suggest',field:d.k,options:d.o,selected:D.a[d.k]||[],text:V.aiq});V.ai={key:d.k,picks:r.picks||[],why:r.why||'',left:r.left}}catch(x){V.ai={err:x.message}}break}
+case 'aiadd':{const d=L[D[k]],r=D.a[d.k]=D.a[d.k]||[];if(!r.includes(v)&&(!d.max||r.length<d.max))r.push(v);break}
+case 'aiov':{const c=cp();V.ov='Thinking…';render();try{const r=await ai({mode:'overview',skill:c.n});c.o={w:r.what,s:r.skills,t:r.start};V.ov=''}catch(x){V.ov=x.message}break}
+case 'aiexp':{V.ex=V.ex||{};V.ex[v]='Thinking…';render();try{const r=await ai({mode:'explain',direction:v,profile:{interests:D.a.interests||[],strengths:D.a.shown||[],values:D.a.values||[]}});V.ex[v]=r.text}catch(x){V.ex[v]=x.message}break}
+case 'rate':{const c=ckNow();c.r=c.r===+v?0:+v;break}
+case 'sum':break;
+case 'inst':{if(dip){dip.prompt();try{await dip.userChoice}catch(x){}dip=null}break}
+case 'pnot':ls('kv_pp',String(Date.now()+14*864e5));break;
+case 'pnever':ls('kv_pp',String(Date.now()+3650*864e5));break;
 case 'forgot':V.mode='forgot';V.err='';break;
 case 'copy':{try{await navigator.clipboard.writeText(refLink());V.cp='Copied!'}catch(x){V.cp='Press and hold the link to copy it.'}break}
 case 'opt':{const d=L[D[k]],s=f==='ob'?D.ob:D.a;if(d.t==='multi'){const r=s[d.k]=s[d.k]||[],i=r.indexOf(v);if(i>-1)r.splice(i,1);else if(!d.max||r.length<d.max)r.push(v)}else s[d.k]=s[d.k]===v?'':v;break}
@@ -197,7 +272,9 @@ case 'out':{await sync();await SB.auth.signOut();me=null;D=null;V.mode='login';b
 case 'del2':{try{const r=await SB.rpc('delete_my_account');if(r.error)throw r.error;await SB.auth.signOut();me=null;D=null;V.cd=false;V.mode='signup'}catch(x){V.msg='Could not delete your account. Try again.'}break}}
 if(!['tab','mode','forgot','copy','export','del0','del1','rm1','rmno','sw'].includes(a))save();render()}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b)act(b.dataset.a,b.dataset.v)});
-document.addEventListener('input',e=>{const el=e.target;if(el.dataset&&el.dataset.pf&&D){D.pd[el.dataset.pf]=el.value;save()}
+document.addEventListener('input',e=>{const el=e.target;if(el.dataset&&el.dataset.aiq){V.aiq=el.value;return}
+if(el.dataset&&el.dataset.ck&&D){ckNow()[el.dataset.ck]=el.value;save()}
+if(el.dataset&&el.dataset.pf&&D){D.pd[el.dataset.pf]=el.value;save()}
 if(el.dataset&&el.dataset.key&&V.f&&D){(V.f==='ob'?D.ob:D.a)[el.dataset.key]=el.value;save()}});
 document.addEventListener('submit',async e=>{e.preventDefault();const g=i=>$(i)?$(i).value.trim():'',em=g('#em').toLowerCase(),pw=$('#pw')?$('#pw').value:'',m=V.mode;V.err='';
 if(m!=='reset'&&!/^\S+@\S+\.\S+$/.test(em)){V.err='Enter a valid email address.';return render()}
