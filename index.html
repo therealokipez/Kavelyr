@@ -9,36 +9,60 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
-:root{--bg:#F3F5F1;--card:#fff;--ink:#0F2A24;--mut:#4A5F59;--line:#DCE4DE;--acc:#1F7A63;--on:#fff;--warm:#FBF1DA;--wink:#4A3A12;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1C19;--card:#152825;--ink:#EAF0EC;--mut:#A9BDB5;--line:#27403A;--acc:#4CC3A2;--on:#06231C;--warm:#3A2F14;--wink:#F2DDA6}}
-:root[data-theme="dark"]{--bg:#0E1C19;--card:#152825;--ink:#EAF0EC;--mut:#A9BDB5;--line:#27403A;--acc:#4CC3A2;--on:#06231C;--warm:#3A2F14;--wink:#F2DDA6}
+:root{--bg:#F2F6F4;--card:#fff;--ink:#0E2A24;--mut:#5A6F68;--line:#E1E9E5;--acc:#1F7A63;--acc2:#2FA37F;--on:#fff;--warm:#FFF3D6;--wink:#5A4310;--sh:0 8px 28px rgba(14,42,36,.08);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1816;--card:#13241F;--ink:#EAF0EC;--mut:#A9BDB5;--line:#26403A;--acc:#4CC3A2;--acc2:#38A98A;--on:#06231C;--warm:#3A2F14;--wink:#F2DDA6;--sh:0 8px 28px rgba(0,0,0,.35)}}
+:root[data-theme="dark"]{--bg:#0B1816;--card:#13241F;--ink:#EAF0EC;--mut:#A9BDB5;--line:#26403A;--acc:#4CC3A2;--acc2:#38A98A;--on:#06231C;--warm:#3A2F14;--wink:#F2DDA6;--sh:0 8px 28px rgba(0,0,0,.35)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*:before,*:after{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.6 'DM Sans',system-ui,sans-serif;min-height:100vh}
+body{margin:0;background:radial-gradient(900px 520px at 90% -8%,rgba(47,163,127,.24),transparent 60%),radial-gradient(700px 520px at -12% 32%,rgba(242,184,75,.2),transparent 60%),radial-gradient(900px 620px at 55% 112%,rgba(31,122,99,.18),transparent 60%),var(--bg);background-attachment:fixed;color:var(--ink);font:400 16px/1.6 'DM Sans',system-ui,sans-serif;min-height:100vh}
 h1,h2{font-family:'Fraunces',Georgia,serif;font-weight:500;line-height:1.15;margin:0 0 12px;letter-spacing:-.01em}
-h1{font-size:clamp(30px,6vw,42px)}h2{font-size:26px}
-.w{max-width:760px;margin:0 auto;padding:20px 20px 60px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}
-.btn{background:var(--acc);color:var(--on);border:1.5px solid var(--acc);border-radius:999px;padding:12px 22px;font:700 16px 'DM Sans',sans-serif;min-height:46px;cursor:pointer}
-.btn.g{background:transparent;color:var(--ink);border-color:var(--ink)}
+h1{font-size:clamp(30px,6vw,40px)}h2{font-size:26px}
+.w{max-width:760px;margin:0 auto;padding:20px 18px 70px}.w.h{padding-top:84px}
+.enter{animation:up .3s ease}@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;margin-bottom:16px;box-shadow:var(--sh)}
+.btn{background:linear-gradient(135deg,var(--acc),var(--acc2));color:var(--on);border:1.5px solid transparent;border-radius:999px;padding:12px 22px;font:700 16px 'DM Sans',sans-serif;min-height:46px;cursor:pointer}
+.btn.g{background:transparent;color:var(--ink);border-color:var(--line)}
 .btn:disabled{opacity:.4;cursor:default}
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
 .chip{background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;font:500 15px 'DM Sans',sans-serif;min-height:44px;cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--acc);color:var(--on);border-color:var(--acc)}
-input[type=text],input[type=email],input[type=password],textarea{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:400 16px 'DM Sans',sans-serif;min-height:46px}
+input[type=text],input[type=email],input[type=password],textarea{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);font:400 16px 'DM Sans',sans-serif;min-height:46px}
 label{font-weight:700;display:block;margin:12px 0 6px}
 .mut{color:var(--mut);font-size:14px;margin:6px 0}
 .tag{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
-.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
-.tabs{display:flex;gap:6px;align-items:center;overflow-x:auto;padding:10px 20px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);border-bottom:1px solid var(--line);z-index:5}
-.brand{font-family:'Fraunces',Georgia,serif;font-size:20px;margin-right:10px}
-.tab{background:transparent;color:var(--ink);border:0;border-radius:999px;padding:10px 16px;font:700 15px 'DM Sans',sans-serif;min-height:44px;cursor:pointer;white-space:nowrap}
-.tab[aria-current="page"]{background:var(--ink);color:var(--bg)}
+.bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:99px}
+.brand{font-family:'Fraunces',Georgia,serif;font-size:22px;font-weight:600}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.warm{background:var(--warm);color:var(--wink);border-radius:12px;padding:12px 14px;margin:10px 0}
+.warm{background:var(--warm);color:var(--wink);border-radius:14px;padding:12px 14px;margin:10px 0}
 .task{display:flex;gap:12px;align-items:center;min-height:44px;font-weight:400;margin:4px 0}
 .task input{width:22px;height:22px;flex:none}
 .quote{border-left:3px solid var(--line);padding-left:12px;color:var(--mut);margin:8px 0}
+.top{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;height:60px;display:flex;align-items:center;gap:10px;padding:0 12px;background:var(--card);border-bottom:1px solid var(--line);z-index:20}
+.ib{position:relative;background:transparent;border:0;color:var(--ink);width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.dot{position:absolute;top:3px;right:3px;background:#E5484D;color:#fff;font:700 11px sans-serif;border-radius:99px;min-width:17px;height:17px;display:flex;align-items:center;justify-content:center;font-style:normal;padding:0 4px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s;z-index:30}.ov.o{opacity:1;pointer-events:auto}
+.dr{position:fixed;top:0;bottom:0;left:0;width:min(84vw,320px);background:var(--card);transform:translateX(-104%);transition:transform .28s ease;z-index:40;padding:calc(env(safe-area-inset-top,0px) + 12px) 14px 20px;overflow:auto;box-shadow:var(--sh)}.dr.o{transform:none}
+.drh{display:flex;align-items:center;gap:12px;margin-bottom:14px}.drh .ib{margin-left:auto}
+.mi{display:flex;align-items:center;gap:14px;width:100%;background:transparent;border:0;color:var(--ink);font:700 16px 'DM Sans',sans-serif;padding:13px 14px;border-radius:16px;min-height:48px;cursor:pointer;text-align:left}
+.mi span{font-size:20px;width:26px;text-align:center}.mi[aria-current="page"]{background:linear-gradient(135deg,var(--acc),var(--acc2));color:var(--on)}
+.av{border-radius:50%;object-fit:cover;background:rgba(127,127,127,.25);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',Georgia,serif;font-weight:600;color:#fff;overflow:hidden;flex:none}
+.hero{background:linear-gradient(135deg,#0F4D3E,#1F7A63 55%,#34B48C);color:#fff;border-radius:26px;padding:22px;margin-bottom:16px;box-shadow:var(--sh)}
+.hm{margin:2px 0 0;color:rgba(255,255,255,.8);font-size:14px}.hb{margin:14px 0;color:rgba(255,255,255,.95)}
+.pill{display:inline-block;background:rgba(255,255,255,.2);border-radius:99px;padding:6px 14px;font-weight:700;font-size:14px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.bg{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
+.bd{text-align:center;padding:12px 6px;border-radius:18px;background:var(--bg);border:1px solid var(--line)}.bd.lock{opacity:.45}
+.bd b{display:block;font-size:28px;line-height:1.3}.bd span{font-size:12px;font-weight:700}
+.toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 70px);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:99px;font-weight:700;z-index:50;box-shadow:var(--sh);max-width:92vw}
+.wel{min-height:100vh;background:radial-gradient(600px 420px at 88% 0%,rgba(242,184,75,.38),transparent 60%),radial-gradient(520px 520px at 0% 100%,rgba(255,255,255,.14),transparent 60%),linear-gradient(160deg,#0B3D31 0%,#1F7A63 55%,#34B48C 100%);color:#fff;padding:28px 20px 44px}
+.wc{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center}
+.wh{color:#fff;font-size:clamp(32px,8vw,46px);margin:0}
+.wsm{margin:0;opacity:.85;letter-spacing:.08em;text-transform:uppercase;font-size:13px;font-weight:700}
+.wbox{width:100%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:22px;padding:16px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.wl{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.85;margin-bottom:4px;font-weight:700}
+.wb{width:100%;background:#fff;color:#0B3D31;border:1.5px solid #fff;border-radius:999px;padding:14px 22px;font:700 17px 'DM Sans',sans-serif;min-height:52px;cursor:pointer}
+.wb.o{background:transparent;color:#fff;border-color:rgba(255,255,255,.65)}
+.wav .av{border:3px solid rgba(255,255,255,.75);box-shadow:0 8px 24px rgba(0,0,0,.25)}
 </style></head>
 <body><div id="app"></div>
 <script>
@@ -47,7 +71,7 @@ const E=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','
 const REC=/type=recovery/.test(location.hash);
 const SB=supabase.createClient('https://unupbkiswkmnoczydhgo.supabase.co','sb_publishable_WApQRt0MfdCvt329JmYVBw_NEEuFCg5');
 const uid=()=>crypto.randomUUID();
-const fresh=()=>({ob:{goals:[]},a:{},done:{},ostep:0,astep:0,plans:[],cur:'',journal:[],dis:[],pd:{},ref:'',refs:0,cks:[],_s:[],_t:[],_j:[]});
+const fresh=()=>({ob:{goals:[]},a:{},done:{},ostep:0,astep:0,plans:[],cur:'',journal:[],dis:[],pd:{},streak:0,last:'',badges:[],ref:'',refs:0,cks:[],_s:[],_t:[],_j:[]});
 const cp=()=>D.plans.find(p=>p.id===D.cur)||null;
 let me=null,D=null,V={tab:'profile',f:null,edit:false,mode:'signup',err:'',exp:false,cd:false,msg:'',ref:'',cp:''},tm=null;
 const save=()=>{if(!me)return;clearTimeout(tm);tm=setTimeout(sync,600)};
@@ -66,7 +90,7 @@ if(sk.length)q.push(()=>SB.from('skills').upsert(sk));
 if(tk.length)q.push(()=>SB.from('tasks').upsert(tk));
 if(jn.length)q.push(()=>SB.from('journal').upsert(jn));
 if(D.cks.length)q.push(()=>SB.from('weekly_checkins').upsert(D.cks.map(c=>({user_id:u,week_start:c.w,energised_text:c.e||null,drained_text:c.d||null,progress_rating:c.r||null,note:c.n||null})),{onConflict:'user_id,week_start'}));
-try{for(const f of q){const r=await f();if(r.error)throw r.error}D._s=ids(sk);D._t=ids(tk);D._j=ids(jn);if(V.msg){V.msg='';render()}}
+try{for(const f of q){const r=await f();if(r.error)throw r.error}D._s=ids(sk);D._t=ids(tk);D._j=ids(jn);await SB.from('profiles').update({streak:D.streak||0,last_active:D.last||null,avatar:D.pd.avatar||null,badges:D.badges||[]}).eq('id',u);if(V.msg){V.msg='';render()}}
 catch(x){V.msg='Could not save your latest changes. Check your connection and try again.';if(me&&!V.f)render()}}
 async function load(){const g=n=>SB.from(n).select('*'),R=await Promise.all([g('profiles'),g('answers'),g('skills').order('created_at'),g('tasks').order('position'),g('journal').order('created_at',{ascending:false})]),bad=R.find(x=>x.error);if(bad)throw bad.error;
 const p=R[0].data[0]||{},a=R[1].data[0]||{};D=fresh();
@@ -75,7 +99,7 @@ D.a={interests:a.interests||[],good:a.good||[],shown:a.shown||[],values:a.core_v
 D.done={ob:!!p.onboarding_done,as:!!p.assessment_done};D.ostep=p.onboarding_step||0;D.astep=p.assessment_step||0;D.dis=p.dismissed||[];
 D.plans=R[2].data.map(s=>({id:s.id,n:s.name,o:pj(s.overview),plan:R[3].data.filter(t=>t.skill_id===s.id).map(t=>({id:t.id,t:t.text,done:t.done}))}));
 D.cur=D.plans[0]?D.plans[0].id:'';
-D.pd={display_name:p.display_name||'',country:p.country||'',bio:p.bio||''};D.ref=p.referral_code||'';
+D.pd={display_name:p.display_name||'',country:p.country||'',bio:p.bio||''};D.ref=p.referral_code||'';D.streak=p.streak||0;D.last=p.last_active||'';D.badges=p.badges||[];D.pd.avatar=p.avatar||'';
 D.journal=R[4].data.map(j=>({id:j.id,d:new Date(j.created_at).toLocaleDateString(),t:j.body,at:j.created_at}));
 D._s=R[2].data.map(x=>x.id);D._t=R[3].data.map(x=>x.id);D._j=R[4].data.map(x=>x.id);const rc=await SB.rpc('my_referral_count');D.refs=rc.data||0;const ck=await SB.from('weekly_checkins').select('*').order('week_start',{ascending:false});D.cks=(ck.data||[]).map(x=>({w:x.week_start,e:x.energised_text||'',d:x.drained_text||'',r:x.progress_rating||0,n:x.note||''}))}
 window.addEventListener('pagehide',()=>{if(tm)sync()});
@@ -163,17 +187,14 @@ const OV={
 'Game design & development':['Creating games, from rules and levels to code and art.',['Game mechanics','Programming','Level design','Playtesting']],
 'Real estate':['Buying, selling, renting, and managing property.',['Negotiation','Local market knowledge','Contracts basics','Networking']]};
 const pj=x=>{try{return x?JSON.parse(x):null}catch(e){return null}};
-function overviewCard(c){const k=OV[c.n],ai=!k&&c.o,o=k?{w:k[0],s:k[1],t:(C.find(x=>x.n===c.n)||{}).x}:c.o;
-return `<div class="card"><span class="tag">About this path</span>${o?`<p>${E(o.w)}</p><p class="mut">Skills to build</p><div class="chips">${(o.s||[]).map(x=>`<span class="chip" style="cursor:default">${E(x)}</span>`).join('')}</div>${o.t?`<p class="mut">Good first step: ${E(o.t)}</p>`:''}${ai?'<p class="mut">AI summary. Check it with someone who works in this field.</p>':''}`:`<p class="mut">Get a short summary of what this path involves.</p><button class="btn g" data-a="aiov">Generate overview (AI)</button>${V.ov?`<p class="warm" role="status">${E(V.ov)}</p>`:''}`}<p class="mut">Coming soon: connect with a teacher who can guide you in this skill.</p></div>`}
-function aiBox(d,v){const a=V.ai||{},pk=a.key===d.k?(a.picks||[]).filter(x=>!(v||[]).includes(x)):[];
-return `<div class="card" style="margin-top:20px"><span class="tag">AI helper</span><label for="aiq">Not sure what to pick? Tell me in your own words.</label><textarea id="aiq" rows="2" data-aiq="1" placeholder="e.g. I enjoy farming and recording voice notes">${E(V.aiq||'')}</textarea><div class="row" style="margin-top:10px"><button class="btn g" data-a="aisug" ${a.busy?'disabled':''}>${a.busy?'Thinking…':'Suggest for me'}</button></div>${a.err?`<p class="warm" role="alert">${E(a.err)}</p>`:''}${a.key===d.k&&a.why?`<p>${E(a.why)}</p>${pk.length?`<div class="chips">${pk.map(x=>`<button class="chip" data-a="aiadd" data-v="${E(x)}">+ ${E(x)}</button>`).join('')}</div>`:''}<p class="mut">AI suggestion. You decide what fits.${a.left!=null?' Questions left today: '+a.left+'.':''}</p>`:''}</div>`}
-async function ai(body){const r=await SB.functions.invoke('coach',{body});if(r.error){let m='The AI helper is not available right now.';try{const j=await r.error.context.json();m=j.error||m}catch(x){}throw new Error(m)}return r.data}
+function overviewCard(c){const k=OV[c.n],o=k?{w:k[0],s:k[1],t:(C.find(x=>x.n===c.n)||{}).x}:{w:'A path you chose yourself. Break it into small actions, practise often, and ask for feedback.',s:['Practice','Feedback','Consistency','Reflection'],t:'Spend 20 minutes this week trying it, then note what you learned'};
+return `<div class="card"><span class="tag">About this path</span><p>${E(o.w)}</p><p class="mut">Skills to build</p><div class="chips">${o.s.map(x=>`<span class="chip" style="cursor:default">${E(x)}</span>`).join('')}</div><p class="mut">Good first step: ${E(o.t)}</p><p class="mut">Coming soon: connect with a teacher who can guide you in this skill.</p></div>`}
 function flow(){const f=V.f,L=f==='ob'?OB:AS,k=f==='ob'?'ostep':'astep',i=D[k],d=L[i],s=f==='ob'?D.ob:D.a,v=s[d.k];
 const body=d.t==='text'?`<textarea data-key="${d.k}" rows="5" aria-label="${E(d.q)}">${E(v||'')}</textarea>`:`<div class="chips">${d.o.map(o=>{const on=d.t==='multi'?(v||[]).includes(o):v===o;return `<button type="button" class="chip" aria-pressed="${on}" data-a="opt" data-v="${E(o)}">${E(o)}</button>`}).join('')}</div>`;
 return `<main class="w"><span class="tag">${f==='ob'?'Getting started':E(d.s)} · ${i+1} of ${L.length}</span>
 <div class="bar" role="progressbar" aria-valuemin="1" aria-valuemax="${L.length}" aria-valuenow="${i+1}"><i style="width:${(i+1)/L.length*100}%"></i></div>
 <h2 style="margin-top:24px">${E(d.q)}</h2>${d.max?`<p class="mut">Choose up to ${d.max}.</p>`:''}
-<p class="mut">${f==='ob'?'Your answers shape suggestions. They are not definitive judgments.':'Skip anything that does not apply. Progress saves automatically.'}</p>${body}${['interests','good','values'].includes(d.k)?aiBox(d,v):''}
+<p class="mut">${f==='ob'?'Your answers shape suggestions. They are not definitive judgments.':'Skip anything that does not apply. Progress saves automatically.'}</p>${body}
 <div class="row" style="margin-top:24px"><button class="btn g" data-a="back" ${i?'':'disabled'}>Back</button><button class="btn" data-a="next">${i===L.length-1?'Finish':'Next'}</button><button class="btn g" data-a="next">Skip</button>${V.edit?'<button class="btn g" data-a="exit">Cancel</button>':''}</div></main>`}
 
 const wk=(d)=>{const x=new Date(d||new Date());x.setDate(x.getDate()-((x.getDay()+6)%7));return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
@@ -188,15 +209,45 @@ if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.ser
 function banner(){if(!D||standalone()||!(dip||ios())||!(D.done.as||D.plans.length))return '';const t=+lg('kv_pp')||0;if(Date.now()<t)return '';
 return `<div class="card"><strong>Install Kavelyr</strong>${dip?'<p class="mut">Add it to your home screen for quick access.</p><div class="row"><button class="btn" data-a="inst">Install</button>':'<p class="mut">Tap the Share button, then “Add to Home Screen”.</p><div class="row">'}<button class="btn g" data-a="pnot">Not now</button><button class="btn g" data-a="pnever">Don't show again</button></div></div>`}
 const refLink=()=>location.origin+location.pathname+'?ref='+(D?D.ref:'');
-const T=[['profile','Profile'],['explore','Explore'],['plan','Plan'],['checkin','Check-in'],['journal','Journal'],['settings','Settings']];
-function home(){return `<nav class="tabs" aria-label="Sections"><span class="brand">Kavelyr</span>${T.map(x=>`<button class="tab" ${V.tab===x[0]?'aria-current="page"':''} data-a="tab" data-v="${x[0]}">${x[1]}</button>`).join('')}</nav><main class="w">${V.msg?`<p class="warm" role="alert">${E(V.msg)}</p>`:''}${banner()}${views[V.tab]()}</main>`}
+const ymd=d=>{const x=d||new Date();return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
+function touch(){const t=ymd(),y=new Date();y.setDate(y.getDate()-1);if(D.last===t)return;D.streak=D.last===ymd(y)?(D.streak||0)+1:1;D.last=t;save()}
+let NT=[];const nk=()=>'kv_n_'+me,svN=()=>ls(nk(),JSON.stringify(NT.slice(0,30)));
+const note=t=>{NT.unshift({t,d:new Date().toISOString(),r:0});svN()};
+function remind(){const c=cp();if(!me||!D||!c||!c.plan.some(p=>!p.done))return;const s=+lg('kv_seen')||0;if(!s){ls('kv_seen',String(Date.now()));return}if(Date.now()-s>=5*36e5){note('Time to check on your '+c.n+' plan. One small action counts.');ls('kv_seen',String(Date.now()))}}
+function loadN(){try{NT=JSON.parse(lg(nk())||'[]')}catch(e){NT=[]}remind()}
+const pct=()=>{const t=D.plans.reduce((a,p)=>a+p.plan.length,0),d=D.plans.reduce((a,p)=>a+p.plan.filter(x=>x.done).length,0);return t?Math.round(d/t*100):0};
+const stage=p=>p>=100?['🏆','Master']:p>=80?['⚡','Advanced']:p>=40?['🛠️','Builder']:p>0?['🌱','Beginner']:['🧭','Starter'];
+function badgesNow(){const P=D.plans,dn=P.reduce((a,p)=>a+p.plan.filter(t=>t.done).length,0),pr=P.map(p=>p.plan.length?p.plan.filter(t=>t.done).length/p.plan.length:0),st=D.streak||0;
+return [['explorer','🧭','Explorer','Finished your assessment',!!D.done.as],['path','🚩','Pathfinder','Picked your first skill',P.length>0],['step','👟','First Step','Completed your first action',dn>0],['half','⛰️','Halfway','Reached 50% on a plan',pr.some(x=>x>=.5)],['fin','🏆','Finisher','Completed a plan',pr.some(x=>x>=1)],['multi','🌱','Growing','Started 2 skills',P.length>1],['refl','📝','Reflector','Wrote a check-in or journal entry',D.cks.length>0||D.journal.length>0],['s3','🔥','On a roll','3-day streak',st>=3],['s7','⚡','Week warrior','7-day streak',st>=7]]}
+function chkBadges(){const B=badgesNow(),nw=B.filter(b=>b[4]&&!D.badges.includes(b[0]));if(!nw.length)return;D.badges=B.filter(b=>b[4]).map(b=>b[0]);nw.forEach(b=>note('New badge: '+b[2]+' — '+b[3]));V.toast='🏅 New badge: '+nw.map(b=>b[2]).join(', ');setTimeout(()=>{V.toast='';const t=document.querySelector('.toast');if(t)t.remove()},4500);save()}
+const ini=()=>((D.pd.display_name||'K')[0]||'K').toUpperCase();
+const avH=z=>D.pd.avatar?`<img class="av" style="width:${z}px;height:${z}px" src="${E(D.pd.avatar)}" alt="Profile photo">`:`<div class="av" style="width:${z}px;height:${z}px;font-size:${Math.round(z*.4)}px">${E(ini())}</div>`;
+const T=[['profile','👤','Profile'],['discovery','🧩','Discovery'],['explore','🧭','Explore'],['plan','🎯','My plans'],['checkin','📅','Check-in'],['journal','📝','Journal'],['alerts','🔔','Notifications'],['premium','⭐','Premium · soon'],['settings','⚙️','Settings']];
+function home(){const un=NT.filter(n=>!n.r).length,st=stage(pct());
+return `<header class="top"><button class="ib" data-a="menu" aria-label="Open menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button><span class="brand">Kavelyr</span><span style="flex:1"></span><button class="ib" data-a="tab" data-v="alerts" aria-label="Notifications"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 6 2 7 2 7H4s2-1 2-7M10 20a2 2 0 0 0 4 0"/></svg>${un?`<i class="dot">${un}</i>`:''}</button></header>
+<div class="ov" id="ov" data-a="mclose"></div>
+<aside class="dr" id="dr" aria-label="Menu"><div class="drh">${avH(52)}<div><strong>${E(D.pd.display_name||'Welcome')}</strong><div class="mut" style="margin:0">${st[0]} ${st[1]} stage</div></div><button class="ib" data-a="mclose" aria-label="Close menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button></div>${T.map(x=>`<button class="mi" ${V.tab===x[0]?'aria-current="page"':''} data-a="tab" data-v="${x[0]}"><span>${x[1]}</span>${x[2]}</button>`).join('')}</aside>
+${V.toast?`<div class="toast" role="status">${E(V.toast)}</div>`:''}<main class="w h">${V.msg?`<p class="warm" role="alert">${E(V.msg)}</p>`:''}${banner()}${views[V.tab]()}</main>`}
 const sec=(t,h)=>`<div class="card"><span class="tag">${t}</span>${h}</div>`;
 const chips=l=>l.length?`<div class="chips">${l.map(i=>`<button class="chip" data-a="dis" data-v="${E(i)}" aria-label="Remove ${E(i)} from my profile">${E(i)} ×</button>`).join('')}</div>`:'<p class="mut">Nothing added yet.</p>';
 const views={
-profile(){const a=D.a,vis=l=>(l||[]).filter(x=>D.dis.indexOf(x)<0),S=vis(a.shown),P=vis((a.good||[]).filter(x=>!(a.shown||[]).includes(x))),
+profile(){const pc=pct(),st=stage(pc),goal=D.ob.reason||(D.ob.goals||[]).join(', '),B=badgesNow(),c=263.9,tt=D.plans.reduce((a,p)=>a+p.plan.length,0),dd=D.plans.reduce((a,p)=>a+p.plan.filter(x=>x.done).length,0);
+return `<div class="hero"><div class="row" style="gap:16px;flex-wrap:nowrap">${avH(76)}<div style="min-width:0"><h1 style="margin:0;color:#fff;font-size:26px">${E(D.pd.display_name||'Your profile')}</h1>${D.pd.country?`<p class="hm">${E(D.pd.country)}</p>`:''}</div></div>${D.pd.bio?`<p class="hb">${E(D.pd.bio)}</p>`:'<p class="hm" style="margin:14px 0">Add a photo and short bio in Settings.</p>'}<span class="pill">${st[0]} ${st[1]} stage</span></div>
+<div class="card"><span class="tag">My goal</span><p style="margin:0;font-size:18px">${goal?E(goal):'Set your goal in Settings.'}</p></div>
+<div class="grid2"><div class="card"><span class="tag">Journey</span><div style="display:flex;align-items:center;gap:14px"><svg width="96" height="96" viewBox="0 0 100 100" role="img" aria-label="${pc} percent complete" style="color:var(--ink);flex:none"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--line)" stroke-width="10"/><circle cx="50" cy="50" r="42" fill="none" stroke="var(--acc)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${pc/100*c} ${c}" transform="rotate(-90 50 50)"/><text x="50" y="57" text-anchor="middle" font-size="22" font-weight="700" fill="currentColor">${pc}%</text></svg><p class="mut" style="margin:0">${dd} of ${tt} actions done</p></div></div>
+<div class="card"><span class="tag">Daily streak</span><p style="font-size:42px;margin:0;line-height:1.1">🔥 ${D.streak||0}</p><p class="mut">${(D.streak||0)>1?'days in a row':'Open Kavelyr daily to grow it'}</p></div></div>
+<div class="card"><span class="tag">My skills</span>${D.plans.map(p=>{const t=p.plan.length,d=p.plan.filter(x=>x.done).length,q=t?Math.round(d/t*100):0;return `<p style="margin:10px 0 6px"><strong>${E(p.n)}</strong> <span class="mut">${q}%</span></p><div class="bar"><i style="width:${q}%"></i></div>`}).join('')||'<p class="mut">Pick a skill in Explore to start your journey.</p>'}</div>
+<div class="card"><span class="tag">Badges · ${B.filter(b=>b[4]).length} of ${B.length}</span><div class="bg">${B.map(b=>`<div class="bd ${b[4]?'':'lock'}" title="${E(b[3])}"><b>${b[4]?b[1]:'🔒'}</b><span>${E(b[2])}</span></div>`).join('')}</div></div>`},
+alerts(){return '<h1>Notifications</h1>'+(NT.length?NT.map(n=>`<div class="card"><p style="margin:0">${E(n.t)}</p><p class="mut">${E(new Date(n.d).toLocaleString())}</p></div>`).join(''):'<div class="card"><p class="mut">Nothing yet. Badges and project reminders will show here.</p></div>')+'<div class="card"><span class="tag">Reminders</span><p class="mut">When you have been away for 5 hours, Kavelyr reminds you to check on your project the next time it is open. Background push alerts are coming soon.</p></div>'},
+premium(){return `<div class="hero"><span class="pill">Coming soon</span><h1 style="color:#fff;margin:12px 0 6px">Kavelyr Premium</h1><p class="hb" style="margin:0">More ways to grow, built around what you told us.</p></div><div class="card"><ul style="margin:0;padding-left:20px;line-height:1.9"><li>More skills and plans</li><li>Connect with teachers for your skills</li><li>Deeper weekly insights</li><li>More badges and learning stages</li></ul><p class="mut">We will announce Premium in your notifications.</p></div>`},
+explore(){const R=rank(),has=D.plans.length>0,sug=R.filter(c=>!D.plans.some(p=>p.n===c.n)),card=c=>{const k=OV[c.n];return `<div class="card"><h2 style="font-size:22px">${E(c.n)}</h2>${k?`<p>${E(k[0])}</p>`:''}<p class="mut">Why it may fit: it matches ${E(c.m.join(', '))}.</p><button class="btn" data-a="pick" data-v="${E(c.n)}">Work on this</button></div>`},
+add=`<div class="card"><span class="tag">Add more skills</span><label for="sk">A skill or direction you want to learn</label><div class="row"><input id="sk" type="text" style="flex:1;min-width:180px" placeholder="e.g. Public speaking"><button class="btn" data-a="addskill">Start plan</button></div>${has&&sug.length?`<div style="margin-top:12px"><button class="btn g" data-a="more">${V.more?'Hide suggestions':'Show suggestions'}</button></div>`:''}</div>`;
+if(has)return `<h1>Explore</h1>${add}${V.more?sug.map(card).join(''):''}`;
+return `<h1>Explore</h1><p class="mut">Suggestions to investigate, not verdicts. You can disagree and explore anything else.</p>`+(R.length?R.map(card).join(''):'<div class="card"><p>Finish your assessment to see areas worth exploring.</p><button class="btn" data-a="edit" data-v="as">Go to assessment</button></div>')+add},
+discovery(){const a=D.a,vis=l=>(l||[]).filter(x=>D.dis.indexOf(x)<0),S=vis(a.shown),P=vis((a.good||[]).filter(x=>!(a.shown||[]).includes(x))),
 n=(a.interests||[]).length+(a.good||[]).length+(a.values||[]).length,R=rank(),pr=[a.learn,a.collab,a.time&&a.time+' a week'].filter(Boolean),
 nx=(cp()?cp().plan:[]).find(p=>!p.done);
-return `<h1>${D.pd.display_name?E(D.pd.display_name)+'’s profile':'My profile'}</h1>${D.pd.country||D.pd.bio?`<p>${E([D.pd.country].filter(Boolean).join(''))}${D.pd.country&&D.pd.bio?' · ':''}${E(D.pd.bio||'')}</p>`:''}<p class="mut">A snapshot of what you told us, plus suggestions. Tap × on anything that does not fit.</p>
+return `<h1>Discovery</h1>${D.pd.country||D.pd.bio?`<p>${E([D.pd.country].filter(Boolean).join(''))}${D.pd.country&&D.pd.bio?' · ':''}${E(D.pd.bio||'')}</p>`:''}<p class="mut">A snapshot of what you told us, plus suggestions. Tap × on anything that does not fit.</p>
 ${n<4?'<p class="warm">This is based on limited information. Add more answers for a fuller picture.</p>':''}
 ${sec('My interests · you said',chips(vis(a.interests)))}
 ${sec('My strengths',`<p class="mut">Shown in real situations · you said</p>${chips(S)}<p class="mut">Possible strengths, not yet shown · you said</p>${chips(P)}<p class="mut">Why: a strength counts as demonstrated only when you pointed to real examples. The rest are possibilities to test.</p>`)}
@@ -206,7 +257,6 @@ ${a.proud||a.aspire?sec('My experiences and aspirations · you said',(a.proud?`<
 ${sec('My opportunities · suggested by Kavelyr',R.length?R.slice(0,3).map(c=>`<p><strong>${E(c.n)}</strong><br><span class="mut">Why it may fit: ${E(c.m.join(', '))}</span></p>`).join('')+'<button class="btn g" data-a="tab" data-v="explore">Explore these</button>':'<p class="mut">Add interests or strengths in your assessment to see suggestions.</p>')}
 ${sec('My next steps · suggested',nx?`<p>${E(nx.t)}</p><button class="btn g" data-a="tab" data-v="plan">Open my plan</button>`:'<p>Choose a direction in Explore to get a small action plan.</p>')}
 ${D.dis.length?'<button class="btn g" data-a="undis">Restore removed items ('+D.dis.length+')</button>':''}`},
-explore(){const R=rank();return `<h1>Explore</h1><p class="mut">Suggestions to investigate, not verdicts. You can disagree and explore anything else.</p>`+(R.length?R.map(c=>`<div class="card"><h2 style="font-size:22px">${E(c.n)}</h2><p>Why it may fit: it matches ${E(c.m.join(', '))}.</p><p class="mut">First experiment: ${E(c.x)}.</p><button class="btn g" style="margin-bottom:10px" data-a="aiexp" data-v="${E(c.n)}">Why this fits (AI)</button>${V.ex&&V.ex[c.n]?`<p>${E(V.ex[c.n])}</p><p class="mut">AI explanation. A suggestion, not a verdict.</p>`:''}${D.plans.some(p=>p.n===c.n)?`<button class="btn g" data-a="pick" data-v="${E(c.n)}">Open my plan</button>`:`<button class="btn" data-a="pick" data-v="${E(c.n)}">Work on this</button>`}</div>`).join(''):'<div class="card"><p>Finish your assessment to see areas worth exploring.</p><button class="btn" data-a="edit" data-v="as">Go to assessment</button></div>')+'<div class="card"><span class="tag">Add your own skill</span><label for="sk">A skill or direction you want to learn</label><div class="row"><input id="sk" type="text" style="flex:1;min-width:180px" placeholder="e.g. Public speaking"><button class="btn" data-a="addskill">Start plan</button></div></div>'},
 plan(){const c=cp();if(!c)return '<h1>My plans</h1><div class="card"><p>Pick a direction in Explore, or add your own skill, and Kavelyr will create a small two-week plan.</p><button class="btn" data-a="tab" data-v="explore">Explore directions</button></div>';
 const P=c.plan,d=P.filter(p=>p.done).length,t=P.length;
 return `<h1>My plans</h1><div class="chips" role="group" aria-label="My skills">${D.plans.map(p=>`<button class="chip" aria-pressed="${p.id===D.cur}" data-a="sw" data-v="${p.id}">${E(p.n)}</button>`).join('')}<button class="chip" data-a="tab" data-v="explore">+ Add another skill</button></div>
@@ -225,21 +275,36 @@ return `<h1>Weekly check-in</h1><p class="mut">Two minutes. Skip any week and no
 ${D.cks.filter(x=>x.w!==wk()).slice(0,4).map(x=>`<div class="card"><span class="tag">Week of ${E(x.w)}</span><p class="mut">Energised: ${E(x.e||'—')}<br>Drained: ${E(x.d||'—')}<br>Progress: ${x.r||'—'}/5</p></div>`).join('')}`},
 journal(){return `<h1>Journal</h1><div class="card"><label for="j">What did you notice, try, or learn?</label><textarea id="j" rows="4"></textarea><div style="margin-top:12px"><button class="btn" data-a="savej">Save reflection</button></div></div>`+(D.journal.length?D.journal.map((e,i)=>`<div class="card"><span class="tag">${E(e.d)}</span><p style="white-space:pre-wrap;margin:0 0 10px">${E(e.t)}</p><button class="btn g" data-a="delj" data-v="${i}">Delete</button></div>`).join(''):'<p class="mut">No reflections yet.</p>')},
 settings(){const l=refLink();return `<h1>Settings and privacy</h1>${dip?'<div class="card"><span class="tag">Install</span><button class="btn" data-a="inst">Install Kavelyr</button></div>':''}
-<div class="card"><span class="tag">Profile details</span><label for="dn">Display name</label><input id="dn" type="text" data-pf="display_name" value="${E(D.pd.display_name)}"><label for="co">Country</label><input id="co" type="text" data-pf="country" value="${E(D.pd.country)}"><label for="bi">About me (optional)</label><textarea id="bi" rows="3" data-pf="bio">${E(D.pd.bio)}</textarea><p class="mut">Saved automatically. Shown only to you.</p></div>
-<div class="card"><span class="tag">Invite friends</span><p class="mut">Share your code. Each friend who joins gives you +3 daily AI questions, up to 5 friends.</p><p style="font-size:26px;font-weight:700;letter-spacing:.1em;margin:6px 0">${E(D.ref||'—')}</p><input type="text" readonly value="${E(l)}" aria-label="My referral link"><div class="row" style="margin-top:12px"><button class="btn g" data-a="copy">Copy link</button><span class="mut">${E(V.cp)}</span></div><p class="mut">Friends joined with your code: ${D.refs}</p></div>
+<div class="card"><span class="tag">Profile details</span><label for="gl">My goal</label><textarea id="gl" rows="2" data-ob="reason">${E(D.ob.reason||'')}</textarea><label for="ph">Profile photo</label><input id="ph" type="file" accept="image/*" data-av="1"><label for="dn">Display name</label><input id="dn" type="text" data-pf="display_name" value="${E(D.pd.display_name)}"><label for="co">Country</label><input id="co" type="text" data-pf="country" value="${E(D.pd.country)}"><label for="bi">About me (optional)</label><textarea id="bi" rows="3" data-pf="bio">${E(D.pd.bio)}</textarea><p class="mut">Saved automatically. Shown only to you.</p></div>
+<div class="card"><span class="tag">Invite friends</span><p class="mut">Share your code. Friends who join with it are counted here, and referrals will count toward Premium perks.</p><p style="font-size:26px;font-weight:700;letter-spacing:.1em;margin:6px 0">${E(D.ref||'—')}</p><input type="text" readonly value="${E(l)}" aria-label="My referral link"><div class="row" style="margin-top:12px"><button class="btn g" data-a="copy">Copy link</button><span class="mut">${E(V.cp)}</span></div><p class="mut">Friends joined with your code: ${D.refs}</p></div>
 <div class="card"><span class="tag">Update my answers</span><p class="mut">Your answers can change anytime. Suggestions update with them.</p><div class="row"><button class="btn g" data-a="edit" data-v="ob">Edit getting-started answers</button><button class="btn g" data-a="edit" data-v="as">Edit assessment</button></div></div>
-<div class="card"><span class="tag">My data</span><p class="mut">We store your answers, plan, and reflections only to personalise your experience. You can view them or delete your account at any time.</p><button class="btn g" data-a="export">${V.exp?'Hide my data':'Show my data'}</button>${V.exp?`<textarea readonly rows="8" style="margin-top:12px" aria-label="My data">${E(JSON.stringify(D,(k,v)=>k[0]==='_'?undefined:v,1))}</textarea>`:''}</div>
 <div class="card"><span class="tag">Account</span><div class="row"><button class="btn g" data-a="out">Log out</button>${V.cd?'<button class="btn" data-a="del2">Yes, permanently delete my account</button><button class="btn g" data-a="del0">Keep it</button>':'<button class="btn g" data-a="del1">Delete account</button>'}</div></div>`}};
 
-function render(){$('#app').innerHTML=!me?auth():V.f?flow():home();window.scrollTo(0,0)}
-async function enter(id){me=id;try{await load()}catch(x){me=null;D=null;throw x}V={tab:'profile',f:!D.done.ob?'ob':!D.done.as?'as':null,edit:false,mode:'login',err:'',exp:false,cd:false,msg:'',ref:V.ref,cp:''}}
-async function act(a,v){const f=V.f,L=f==='ob'?OB:AS,k=f==='ob'?'ostep':'astep';
+let lk='';
+let WEL=true;
+const fd=n=>n.toLocaleDateString([],{weekday:'long',day:'numeric',month:'long',year:'numeric'}),ft=n=>n.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+function tick(){const n=new Date(),a=document.getElementById('ct'),b=document.getElementById('cd');if(a)a.textContent=ft(n);if(b)b.textContent=fd(n)}
+function welcome(){const g=!me,n=new Date(),nm=g?'':(D.pd.display_name||'Friend'),goal=g?'':(cp()?cp().n:(D.ob.reason||''));
+return `<main class="wel enter"><div class="wc"><span class="brand" style="color:#fff">Kavelyr</span>
+${g?'':`<div class="wav">${avH(104)}</div>`}
+<p class="wsm">${g?'Welcome to Kavelyr':'Welcome back'}</p>
+<h1 class="wh">${g?'Discover who you can become.':E(nm)}</h1>
+${g?'':`<div class="wbox"><span class="wl">You are becoming</span><strong style="font-size:20px">${goal?E(goal):'Choose your path in Explore'}</strong></div>`}
+<div class="wbox"><span class="wl" id="cd">${fd(n)}</span><strong id="ct" style="font-size:32px">${ft(n)}</strong></div>
+${g?`<button class="wb" data-a="wlogin">Login</button><button class="wb o" data-a="wsign">Create new account</button>`:`<button class="wb" data-a="enterapp">Continue to my journey</button>`}
+${V.ref&&g?`<p class="wsm" style="text-transform:none;letter-spacing:0">Referral code applied: ${E(V.ref)}</p>`:''}
+${g?'':`<button class="wb o" style="font-size:15px;min-height:46px" data-a="out">Not you? Log out</button>`}
+</div></main>`}
+function render(){const k=WEL?'w':!me?'a'+V.mode:V.f?'f'+V.f+(V.f==='ob'?D.ostep:D.astep):'h'+V.tab,y=window.scrollY;if(me&&D&&!V.f&&!WEL)chkBadges();$('#app').innerHTML=WEL?welcome():!me?auth():V.f?flow():home();const nw=k!==lk;lk=k;if(nw){window.scrollTo(0,0);const m=$('#app main');if(m)m.classList.add('enter')}else window.scrollTo(0,y)}
+async function enter(id){me=id;try{await load()}catch(x){me=null;D=null;throw x}touch();loadN();V={tab:'profile',f:!D.done.ob?'ob':!D.done.as?'as':null,edit:false,mode:'login',err:'',exp:false,cd:false,msg:'',ref:V.ref,cp:''}}
+async function act(a,v){if(a==='menu'||a==='mclose'){document.querySelectorAll('#dr,#ov').forEach(e=>e.classList[a==='menu'?'toggle':'remove']('o'));return}
+const f=V.f,L=f==='ob'?OB:AS,k=f==='ob'?'ostep':'astep';
 switch(a){
 case 'mode':V.mode=V.mode==='signup'?'login':V.mode==='forgot'?'login':'signup';V.err='';break;
-case 'aisug':{const d=L[D[k]];if(!V.aiq){V.ai={err:'Describe what you enjoy first.'};break}V.ai={busy:true};render();try{const r=await ai({mode:'suggest',field:d.k,options:d.o,selected:D.a[d.k]||[],text:V.aiq});V.ai={key:d.k,picks:r.picks||[],why:r.why||'',left:r.left}}catch(x){V.ai={err:x.message}}break}
-case 'aiadd':{const d=L[D[k]],r=D.a[d.k]=D.a[d.k]||[];if(!r.includes(v)&&(!d.max||r.length<d.max))r.push(v);break}
-case 'aiov':{const c=cp();V.ov='Thinking…';render();try{const r=await ai({mode:'overview',skill:c.n});c.o={w:r.what,s:r.skills,t:r.start};V.ov=''}catch(x){V.ov=x.message}break}
-case 'aiexp':{V.ex=V.ex||{};V.ex[v]='Thinking…';render();try{const r=await ai({mode:'explain',direction:v,profile:{interests:D.a.interests||[],strengths:D.a.shown||[],values:D.a.values||[]}});V.ex[v]=r.text}catch(x){V.ex[v]=x.message}break}
+case 'enterapp':WEL=false;break;
+case 'wlogin':WEL=false;V.mode='login';V.err='';break;
+case 'wsign':WEL=false;V.mode='signup';V.err='';break;
+case 'wref':{V.ref=((($('#wrc')||{}).value)||'').trim().toUpperCase();WEL=false;V.mode='signup';V.err='';break}
 case 'rate':{const c=ckNow();c.r=c.r===+v?0:+v;break}
 case 'sum':break;
 case 'inst':{if(dip){dip.prompt();try{await dip.userChoice}catch(x){}dip=null}break}
@@ -251,7 +316,8 @@ case 'opt':{const d=L[D[k]],s=f==='ob'?D.ob:D.a;if(d.t==='multi'){const r=s[d.k]
 case 'back':D[k]--;break;
 case 'next':if(D[k]<L.length-1)D[k]++;else{D.done[f]=true;D[k]=0;if(f==='ob'&&!D.done.as&&!V.edit)V.f='as';else{V.f=null;V.edit=false;V.tab='profile'}}break;
 case 'exit':V.f=null;V.edit=false;break;
-case 'tab':V.tab=v;V.exp=false;break;
+case 'tab':V.tab=v;if(v==='alerts'){NT.forEach(n=>{n.r=1});svN()}break;
+case 'more':V.more=!V.more;break;
 case 'dis':D.dis.push(v);break;
 case 'undis':D.dis=[];break;
 case 'pick':{const c=C.find(x=>x.n===v);let p=D.plans.find(x=>x.n===c.n);if(!p){p={id:uid(),n:c.n,plan:[{t:'Talk to someone working in '+c.n+' for 15 minutes (days 1–5)'},{t:c.x+' (days 3–10)'},{t:'Write down what energised you and what drained you (days 11–14)'}]};D.plans.push(p)}D.cur=p.id;V.tab='plan';break}
@@ -268,11 +334,12 @@ case 'edit':V.f=v;V.edit=true;D[v==='ob'?'ostep':'astep']=0;break;
 case 'export':V.exp=!V.exp;break;
 case 'del1':V.cd=true;break;
 case 'del0':V.cd=false;break;
-case 'out':{await sync();await SB.auth.signOut();me=null;D=null;V.mode='login';break}
-case 'del2':{try{const r=await SB.rpc('delete_my_account');if(r.error)throw r.error;await SB.auth.signOut();me=null;D=null;V.cd=false;V.mode='signup'}catch(x){V.msg='Could not delete your account. Try again.'}break}}
+case 'out':{await sync();await SB.auth.signOut();me=null;D=null;WEL=true;V.mode='login';break}
+case 'del2':{try{const r=await SB.rpc('delete_my_account');if(r.error)throw r.error;await SB.auth.signOut();me=null;D=null;WEL=true;V.cd=false;V.mode='signup'}catch(x){V.msg='Could not delete your account. Try again.'}break}}
 if(!['tab','mode','forgot','copy','export','del0','del1','rm1','rmno','sw'].includes(a))save();render()}
-document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b)act(b.dataset.a,b.dataset.v)});
-document.addEventListener('input',e=>{const el=e.target;if(el.dataset&&el.dataset.aiq){V.aiq=el.value;return}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b){ls('kv_seen',String(Date.now()));act(b.dataset.a,b.dataset.v)}});
+document.addEventListener('change',e=>{const el=e.target;if(el.dataset&&el.dataset.av&&el.files&&el.files[0]&&D){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=c.height=160;const x=c.getContext('2d'),m=Math.min(im.width,im.height);x.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,160,160);D.pd.avatar=c.toDataURL('image/jpeg',.8);save();render()};im.src=r.result};r.readAsDataURL(el.files[0])}});
+document.addEventListener('input',e=>{const el=e.target;if(el.dataset&&el.dataset.ob&&D){D.ob[el.dataset.ob]=el.value;save()}
 if(el.dataset&&el.dataset.ck&&D){ckNow()[el.dataset.ck]=el.value;save()}
 if(el.dataset&&el.dataset.pf&&D){D.pd[el.dataset.pf]=el.value;save()}
 if(el.dataset&&el.dataset.key&&V.f&&D){(V.f==='ob'?D.ob:D.a)[el.dataset.key]=el.value;save()}});
@@ -289,6 +356,6 @@ else{const r=await SB.auth.signInWithPassword({email:em,password:pw});if(r.error
 catch(x){V.err=x.message||'Something went wrong. Try again.'}
 render()});
 (async function(){$('#app').innerHTML='<main class="w"><p class="mut">Loading…</p></main>';V.ref=(new URLSearchParams(location.search).get('ref')||'').toUpperCase();
-if(REC){V.mode='reset';render();return}
-const r=await SB.auth.getSession(),ss=r.data.session;if(ss){try{await enter(ss.user.id)}catch(x){V.err='Could not load your data. Log in again.'}}render()})();
+if(REC){WEL=false;V.mode='reset';render();return}
+const r=await SB.auth.getSession(),ss=r.data.session;if(ss){try{await enter(ss.user.id)}catch(x){V.err='Could not load your data. Log in again.'}}render();setInterval(tick,1000);setInterval(()=>{if(me&&D)remind()},36e5)})();
 </script></body></html>
